@@ -64,6 +64,10 @@ const MainRoutes = {
                     path: 'orders',
                     element: <DashboardDefault />
                 },
+                {
+                    path: 'sales',
+                    element: <DashboardDefault />
+                },
             ]
         },
         {

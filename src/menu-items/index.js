@@ -46,6 +46,14 @@ const menuItems = {
                     url: '/management/orders',
                     icon: WechatOutlined,
                     breadcrumbs: false
+                } ,
+                {
+                    id: 'sales',
+                    title: 'Quản lý khuyến mãi',
+                    type: 'item',
+                    url: '/management/sales',
+                    icon: WechatOutlined,
+                    breadcrumbs: false
                 } 
             ]
         },
