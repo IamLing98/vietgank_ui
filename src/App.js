@@ -10,14 +10,12 @@ import Background from 'assets/images/ximang_background.jpg'
 axiosInterceptor()
 // ==============================|| APP - THEME, ROUTER, LOCAL  ||============================== //
 
-const App = () => (
-    // <div style={{backgroundImage:`url(${Background})`}}>
+const App = () => ( 
     <ThemeCustomization>
         <ScrollTop>
             <Routes />
         </ScrollTop>
-    </ThemeCustomization>
-    // </div>
+    </ThemeCustomization> 
 );
 
 export default App;
