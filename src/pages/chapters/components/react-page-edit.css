@@ -1,0 +1,11 @@
+.react-page-plugin-drawer > div.MuiDrawer-paper {
+    z-index: 1300 !important;
+}
+
+div.MuiDrawer-paperAnchorBottom {
+    z-index: 2300 !important;
+}
+
+.react-page-plugins-content-slate-inline-toolbar {
+    z-index: 2400 !important;
+}
