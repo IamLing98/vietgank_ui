@@ -32,7 +32,7 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { login } from 'store/reducers/authSlice';
+import { loginSuccess } from 'store/reducers/authSlice';
 import { useDispatch } from 'react-redux';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
@@ -53,11 +53,10 @@ const AuthLogin = () => {
 
     const handleLogin = async (formData) => {
         try {
-            const response = await axios.post(process.env.REACT_APP_LOGIN_URL, formData);
+            const response = await axios.post('/signin', formData);
             return response;
         } catch (e) {
-            toast('Wow something wrong!');
-            console.log('Wow something wrong!');
+            toast('Lỗi đăng nhập');
         }
     };
 
@@ -70,20 +69,24 @@ const AuthLogin = () => {
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
-                    email: Yup.string().max(255).required('Trường thông tin bắt buộc'),
+                    username: Yup.string().max(255).required('Trường thông tin bắt buộc'),
                     password: Yup.string().max(255).required('Trường thông tin bắt buộc')
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
+                        await axios.post('/signin', values).then(response => {
+                            let data = response.data
+                            if (data?.success) {
+                                dispatch(loginSuccess({ token: data?.data?.access_token }));
+                                navigate('/dashboard/default');
+                            } else {
+                                toast.error('Lỗi đăng nhập')
+                            }
+
+                        }).catch(error => {
+                            toast.error('Lỗi đăng nhập')
+                        });
                         setStatus({ success: false });
-                        const response = await handleLogin(values);
-                        const data = response.data;
-                        // 1. save
-                        localStorage.setItem('token', data?.token);
-                        // 2. dispatch
-                        dispatch(login());
-                        // 3. navigate to.
-                        navigate('/dashboard/default');
 
                         setTimeout(() => setSubmitting(false), 3000);
                     } catch (err) {
@@ -186,6 +189,7 @@ const AuthLogin = () => {
                                         type="submit"
                                         variant="contained"
                                         color="primary"
+                                        className='bg-black'
                                     >
                                         Đăng nhập
                                     </Button>

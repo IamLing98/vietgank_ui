@@ -353,7 +353,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div className="py-3">
                     <div className="flex items-center gap-x-3">
-                        <h2 className="text-lg font-medium text-gray-800 dark:text-white">Danh sách tài khoản</h2>
+                        <h2 className="text-lg font-medium text-gray-800 dark:text-white">Danh mục</h2>
                         <span className="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400">
                             Tổng số bản ghi: {dataSource?.total}
                         </span>

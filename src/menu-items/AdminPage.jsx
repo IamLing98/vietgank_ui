@@ -52,11 +52,19 @@ const pages = {
             target: false, 
         },
         {
+            id: 'admin-categories',
+            type: 'item',
+            title: 'Cấu hình danh mục',
+            icon: icons.ShoppingCartOutlined,
+            url: '/admin/categories',
+            target: false, 
+        },
+        {
             id: 'admin-config',
             type: 'item',
-            title: 'Cấu hình',
+            title: 'Cài đặt',
             icon: icons.ShoppingCartOutlined,
-            url: '/e-commerce/product-list',
+            url: '/admin/settings',
             target: false, 
         },
     ]

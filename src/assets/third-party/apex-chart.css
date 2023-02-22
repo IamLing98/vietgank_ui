@@ -2,3 +2,29 @@
     left: -4px !important;
     top: 2px !important;
 }
+
+.MuiInputLabel-root{
+    line-height: 0.9em !important;
+}
+
+.text-red{
+    color:red !important;
+}
+
+.MuiFormLabel-asterisk{
+    color:red !important;
+}
+
+.MuiTablePagination-displayedRows{
+    font-size: 0.9rem !important;
+}
+
+.MuiTablePagination-selectLabel{
+    font-size: 0.9rem !important;
+}
+.Mui-disabled{
+    color: black !important;
+}
+.MuiFormLabel-root{
+    color: black !important;
+}

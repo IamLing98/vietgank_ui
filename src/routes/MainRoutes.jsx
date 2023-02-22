@@ -76,6 +76,8 @@ const ChapterListTable = Loadable(lazy(() => import('pages/chapters/list/Chapter
 
 
 const UserManagement = Loadable(lazy(() => import('pages/admin/users')));
+const Settings = Loadable(lazy(() => import('pages/admin/settings')));
+const Categories = Loadable(lazy(() => import('pages/admin/categories')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -246,12 +248,16 @@ const MainRoutes = {
             path: 'admin',
             children: [
                 {
-                    path: 'config',
-                    element: <CopyToClipboard />
+                    path: 'settings',
+                    element: <Settings />
                 },
                 {
                     path: 'users',
                     element: <UserManagement />
+                },
+                {
+                    path: 'categories',
+                    element: <Categories />
                 }
             ]
         },

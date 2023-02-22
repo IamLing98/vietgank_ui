@@ -36,10 +36,10 @@ export default function BasicBreadcrumbs() {
         object.page = object.page + 1;
         const qs = '?' + new URLSearchParams(dataUtils?.removeNullOrUndefined(object)).toString();
         axios
-            .get(`/api/user${qs}`)
+            .get(`/api/category${qs}`)
             .then(async (response) => {
                 let data = response.data;
-                if (data?.success) {
+                if (data?.success && Array.isArray(data?.data)) {
                     setDataSource({
                         data: data?.data?.map((item) => dataUtils?.snakeToCamelCase(item)),
                         total: data?.meta?.total
@@ -49,7 +49,7 @@ export default function BasicBreadcrumbs() {
                 return data.dataSource;
             })
             .catch((err) => {
-                setDataSource({ data: [], total: 0 }); 
+                setDataSource({ data: [], total: 0 });
                 setLoading(false);
             });
     }
@@ -112,7 +112,7 @@ export default function BasicBreadcrumbs() {
 
     return (
         <>
-            <Breadcrumbs values={['Quản trị hệ thống', 'Quản lý tài khoản']} />
+            <Breadcrumbs values={['Quản trị hệ thống', 'Quản lý danh mục']} />
             <section className="  mx-auto">
                 {pageStatus.status === constants.PAGE_STATUS.LIST.status || pageStatus.status === constants.PAGE_STATUS.DELETE.status ? (
                     <>

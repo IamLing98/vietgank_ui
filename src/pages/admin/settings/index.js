@@ -25,8 +25,7 @@ export default function BasicBreadcrumbs() {
 
     const [searchValues, setSearchValues] = useState({
         page: 0,
-        size: 10,
-        is_deleted: 'false'
+        size: 10
     });
 
     async function getDataSource(searchValues) {
@@ -35,9 +34,9 @@ export default function BasicBreadcrumbs() {
         let object = { ...searchValues };
         object.page = object.page + 1;
         const qs = '?' + new URLSearchParams(dataUtils?.removeNullOrUndefined(object)).toString();
-        axios
-            .get(`/api/user${qs}`)
-            .then(async (response) => {
+        await   axios
+            .get(`/api/setting${qs}`)
+            .then((response) => {
                 let data = response.data;
                 if (data?.success) {
                     setDataSource({
@@ -45,13 +44,12 @@ export default function BasicBreadcrumbs() {
                         total: data?.meta?.total
                     });
                 }
-                await setLoading(false);
                 return data.dataSource;
             })
             .catch((err) => {
-                setDataSource({ data: [], total: 0 }); 
-                setLoading(false);
+                setDataSource({data:[], total:0});
             });
+        await setLoading(false);
     }
 
     useEffect(() => {
@@ -112,17 +110,17 @@ export default function BasicBreadcrumbs() {
 
     return (
         <>
-            <Breadcrumbs values={['Quản trị hệ thống', 'Quản lý tài khoản']} />
+            <Breadcrumbs values={['Quản trị hệ thống', 'Cài đặt']} />
             <section className="  mx-auto">
                 {pageStatus.status === constants.PAGE_STATUS.LIST.status || pageStatus.status === constants.PAGE_STATUS.DELETE.status ? (
                     <>
                         <List
-                            loading={loading}
                             setPageStatus={setPageStatus}
                             columns={columns}
                             dataSource={dataSource}
                             setSearchValues={setSearchValues}
                             searchValues={searchValues}
+                            loading={loading}
                         />
                         <DeleteConfirm
                             pageStatus={pageStatus}

@@ -20,13 +20,13 @@ const Login = () => (
             <Grid item xs={12}>
                 <AuthLogin />
             </Grid>
-            <Grid item xs={12} justifyContent="flex-end" display="flex">
+            {/* <Grid item xs={12} justifyContent="flex-end" display="flex">
                 <Link to={'/dashboard/default'} style={{ textDecoration: 'none' }}>
                     <Typography color="error" variant="h5">
                         Bỏ qua(dev)
                     </Typography>
                 </Link>
-            </Grid>
+            </Grid> */}
         </Grid>
     </AuthWrapper>
 );
