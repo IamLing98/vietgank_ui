@@ -2,6 +2,7 @@
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 
+import './index.css'
 // scroll bar
 import 'simplebar/src/simplebar.css';
 

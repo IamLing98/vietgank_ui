@@ -3,28 +3,67 @@
     top: 2px !important;
 }
 
-.MuiInputLabel-root{
+.MuiInputLabel-root {
     line-height: 0.9em !important;
 }
 
-.text-red{
-    color:red !important;
+.text-red {
+    color: red !important;
 }
 
-.MuiFormLabel-asterisk{
-    color:red !important;
+.MuiFormLabel-asterisk {
+    color: red !important;
 }
 
-.MuiTablePagination-displayedRows{
+.MuiTablePagination-displayedRows {
     font-size: 0.9rem !important;
 }
 
-.MuiTablePagination-selectLabel{
+.MuiTablePagination-selectLabel {
     font-size: 0.9rem !important;
 }
-.Mui-disabled{
+
+.Mui-disabled {
     color: black !important;
 }
-.MuiFormLabel-root{
+
+.MuiFormLabel-root {
     color: black !important;
+}
+
+#form-file-upload {
+    height: 16rem;
+    width: 28rem;
+    max-width: 100%;
+    text-align: center;
+    position: relative;
+}
+
+#input-file-upload {
+    display: none;
+}
+
+#label-file-upload {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-width: 2px;
+    border-radius: 1rem;
+    border-style: dashed;
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+.upload-button {
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1rem;
+    border: none;
+    font-family: 'Oswald', sans-serif;
+    background-color: transparent;
+}
+
+.upload-button:hover {
+    text-decoration-line: underline;
 }

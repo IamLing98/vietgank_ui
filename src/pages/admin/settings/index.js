@@ -25,12 +25,11 @@ export default function BasicBreadcrumbs() {
 
     const [searchValues, setSearchValues] = useState({
         page: 0,
-        size: 10
+        size: 100
     });
 
     async function getDataSource(searchValues) {
-        await setLoading(true);
-        console.log(searchValues);
+        await setLoading(true); 
         let object = { ...searchValues };
         object.page = object.page + 1;
         const qs = '?' + new URLSearchParams(dataUtils?.removeNullOrUndefined(object)).toString();
@@ -54,28 +53,12 @@ export default function BasicBreadcrumbs() {
 
     useEffect(() => {
         getDataSource(searchValues);
-    }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
-
-    async function onCreate(values) {
-        values.password = constants.AUTH.P_DEFAULT;
-        await axios
-            .post('/api/user', values)
-            .then((response) => {
-                if (response?.data?.success) {
-                    toast.info('Tạo mới thành công');
-                    setPageStatus(constants.PAGE_STATUS.LIST);
-                } else {
-                    toast.error('Tạo mới thất bại');
-                }
-            })
-            .catch((err) => {
-                toast.error('Tạo mới thất bại');
-            });
-    }
+    }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]); 
 
     async function onUpdate(values) {
+        console.log(`Values: `, values)
         await axios
-            .put('/')
+            .put(`/api/setting/${values?.key}`, values)
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Cập nhật thành công');
@@ -131,12 +114,7 @@ export default function BasicBreadcrumbs() {
                     </>
                 ) : (
                     ''
-                )}
-                {pageStatus.status === constants.PAGE_STATUS.CREATE.status ? (
-                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} />
-                ) : (
-                    ''
-                )}
+                )} 
                 {pageStatus.status === constants.PAGE_STATUS.UPDATE.status ? (
                     <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} />
                 ) : (

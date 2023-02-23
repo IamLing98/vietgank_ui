@@ -26,12 +26,13 @@ export default function BasicBreadcrumbs() {
     const [searchValues, setSearchValues] = useState({
         page: 0,
         size: 10,
-        is_deleted: 'false'
+        parent_category_id: -1
     });
+
+    const [parentCategories, setParentCategories] = useState([]);
 
     async function getDataSource(searchValues) {
         await setLoading(true);
-        console.log(searchValues);
         let object = { ...searchValues };
         object.page = object.page + 1;
         const qs = '?' + new URLSearchParams(dataUtils?.removeNullOrUndefined(object)).toString();
@@ -54,8 +55,35 @@ export default function BasicBreadcrumbs() {
             });
     }
 
+    async function getParentCategories() {
+        await setLoading(true);
+        axios
+            .get(`/api/category?parent_category_id=-1`)
+            .then(async (response) => {
+                let data = response.data;
+                if (data?.success && Array.isArray(data?.data)) {
+                    let parents = data?.data?.map((item) => {
+                        let newItem = dataUtils?.snakeToCamelCase(item);
+                        return {
+                            id: newItem?._id,
+                            label: newItem?.categoryName
+                        };
+                    });
+                    console.log(`parent`, parent)
+                    setParentCategories(parents);
+                }
+                await setLoading(false);
+                return data.dataSource;
+            })
+            .catch((err) => {
+                setParentCategories([]);
+                setLoading(false);
+            });
+    }
+
     useEffect(() => {
         getDataSource(searchValues);
+        getParentCategories(searchValues);
     }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
 
     async function onCreate(values) {
@@ -110,6 +138,10 @@ export default function BasicBreadcrumbs() {
         await setPageStatus(constants.PAGE_STATUS.LIST);
     }
 
+    function handleChangeParentCategory(value) {
+        console.log(value);
+    }
+
     return (
         <>
             <Breadcrumbs values={['Quản trị hệ thống', 'Quản lý danh mục']} />
@@ -123,6 +155,8 @@ export default function BasicBreadcrumbs() {
                             dataSource={dataSource}
                             setSearchValues={setSearchValues}
                             searchValues={searchValues}
+                            handleChangeParentCategory={handleChangeParentCategory}
+                            parentCategories={parentCategories }
                         />
                         <DeleteConfirm
                             pageStatus={pageStatus}

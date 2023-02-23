@@ -6,80 +6,99 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { FormControl, InputLabel, Typography } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
-
-// import TextField from '@mui/material/TextField';
-
-import DateFnsUtils from '@date-io/date-fns';
-import {
-    TextField,
-    Checkbox,
-    Select,
-    MenuItem,
-    Switch,
-    RadioGroup,
-    FormControlLabel,
-    ThemeProvider,
-    Radio,
-    createMuiTheme,
-    Slider,
-    Box
-} from '@mui/material';
-// import {
-//   KeyboardDatePicker,
-//   MuiPickersUtilsProvider
-// } from "@mui/material";
-// import MuiAutoComplete from "./MuiAutoComplete";
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { Modal, Upload } from 'antd';
 
 import DatePicker from '@mui/lab/DatePicker';
 import dataUtils from 'utils/dataUtils';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const initDefaultValues = {
-    userInfo: {
-        fullName: null,
-        email: null,
-        phoneNumber: null
-    },
-    username: null,
-    role: null
+    c: null
 };
 
 export default ({ onSubmit, pageStatus, setPageStatus }) => {
     const [defaultValues, setDefaultValues] = useState({ ...initDefaultValues });
 
+    const [imagePreviewUrl, setImagePreviewUrl] = useState();
+
     const schema = yup.object().shape({
-        userInfo: yup.object().shape({
-            fullName: yup.string().nullable().required('Trường thông tin bắt buộc'),
-            email: yup.string().nullable().required('Trường thông tin bắt buộc').email('Định dạng mail không đúng'),
-            phoneNumber: yup.string().nullable().required('Trường thông tin bắt buộc')
-        }),
-        username: yup.string().nullable().required('Trường thông tin bắt buộc'),
-        role: yup.string().nullable().required('Trường thông tin bắt buộc')
+        value: yup.string().nullable().required('Trường thông tin bắt buộc')
     });
+
+    const [loading, setLoading] = useState(false);
+    const [imageUrl, setImageUrl] = useState();
 
     const {
         handleSubmit,
         formState: { errors },
-        control
+        control,
+        setValue
     } = useForm({
         resolver: yupResolver(schema),
         mode: 'onChange',
         defaultValues: useMemo(() => {
-            return pageStatus.record;
+            let newDefaultValues = {...pageStatus?.record}
+            setImagePreviewUrl(newDefaultValues.value)
+            newDefaultValues.value = null 
+            return newDefaultValues;
         }, [JSON.stringify(pageStatus)])
     });
 
-    // useEffect(() => {
-    //     if (pageStatus?.status === constants.PAGE_STATUS.UPDATE.status) { 
-    //         setDefaultValues(pageStatus?.record);
-    //     }
-    // }, [JSON.stringify(pageStatus)]); 
+    const getBase64 = (img, callback) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => callback(reader.result));
+        reader.readAsDataURL(img);
+    };
+
+    const beforeUpload = (file) => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+            toast.error('Chỉ cho phép upload ảnh!');
+        }
+        const isLt2M = file.size / 1024 / 1024 < 10;
+        if (!isLt2M) {
+            toast.error('File ảnh phải nhỏ hơn 10MB!');
+        }
+        return isJpgOrPng && isLt2M;
+    };
+
+    const handleChange = (info) => {
+        if (info.file.status === 'uploading') {
+            // setLoading(true);
+            return;
+        }
+        if (info.file.status === 'done') {
+            // Get this url from response in real world.
+            getBase64(info.file.originFileObj, (url) => {
+                // setLoading(false);
+                setImageUrl(url);
+            });
+        }
+    };
+
+    const uploadButton = (
+        <div>
+            {loading ? <LoadingOutlined /> : <PlusOutlined />}
+            <div
+                style={{
+                    marginTop: 8
+                }}
+            >
+                Upload
+            </div>
+        </div>
+    );
 
     return (
         <>
             <div className="py-3">
                 <div className="flex items-center gap-x-3">
                     <h2 className="text-lg font-medium text-gray-800 dark:text-white">
-                        {pageStatus?.status === constants?.PAGE_STATUS.CREATE.status ? `Tạo mới tài khoản` : `Cập nhật tài khoản (${pageStatus?.record?.username})`} 
+                        {pageStatus?.status === constants?.PAGE_STATUS.CREATE.status
+                            ? `Tạo mới tài khoản`
+                            : `Cập nhật cấu hình (${pageStatus?.record?.description})`}
                     </h2>
                 </div>
             </div>
@@ -87,138 +106,59 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
             <form>
                 <div className="container bg-white p-3">
                     <div className="flex items-center gap-x-3">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin cá nhân</h3>
+                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin cấu hình </h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Họ và tên"
-                                            error={!!formState.errors?.userInfo?.fullName}
-                                            placeholder="Họ và tên"
-                                            className="mt-3 w-full"
-                                            type="text"
-                                            variant="outlined"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                        />
-                                    );
+                    <div className=" container flex justify-between">
+                        <div>
+                            <Upload
+                                name="avatar"
+                                listType="picture-circle"
+                                className="avatar-uploader"
+                                showUploadList={false}
+                                action={async (file) => {
+                                    setLoading(true);
+                                    console.log(`Handle upload file`, file);
+                                    let formData = new FormData();
+                                    formData.append('file', file);
+                                    let data = await axios
+                                        .post('/api/file/upload', formData)
+                                        .then(async (response) => {
+                                            let url = response.data?.url;
+                                            setImagePreviewUrl(url);
+                                            setValue('value', url);
+                                            setLoading(false);
+                                            return true;
+                                        })
+                                        .catch((err) => {
+                                            console.error(err);
+                                        });
+                                    return data;
                                 }}
-                                name="userInfo.fullName"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.userInfo?.fullName?.message}</p>
-                        </Box>
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Số điện thoại"
-                                            error={!!formState.errors?.userInfo?.phoneNumber}
-                                            placeholder="Số điện thoại"
-                                            className="mt-3 w-full"
-                                            type="text"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                        />
-                                    );
-                                }}
-                                name="userInfo.phoneNumber"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.userInfo?.phoneNumber?.message}</p>
-                        </Box>
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Email"
-                                            error={!!formState.errors?.userInfo?.email}
-                                            placeholder="Email"
-                                            className="mt-3 w-full"
-                                            type="email"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                        />
-                                    );
-                                }}
-                                name="userInfo.email"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.userInfo?.email?.message}</p>
-                        </Box>
-                    </div>
-                </div>
-                <div className="container bg-white p-3 mt-5">
-                    <div className="flex items-center gap-x-3">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin tài khoản</h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Tài khoản"
-                                            error={!!formState.errors?.username}
-                                            placeholder="Tài khoản"
-                                            className="mt-3 w-full"
-                                            type="text"
-                                            variant="outlined"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                            disabled={pageStatus?.status === constants?.PAGE_STATUS.UPDATE.status }
+                                beforeUpload={beforeUpload}
+                                onChange={handleChange}
+                            >
+                                {imageUrl ? (
+                                    <img
+                                        src={imageUrl}
+                                        alt="avatar"
+                                        style={{
+                                            width: '100%'
+                                        }}
+                                    />
+                                ) : (
+                                    uploadButton
+                                )}
+                            </Upload>
+                            <p className="text-red">{errors?.value?.message}</p>
+                            <div className="image-preview">
+                                {imagePreviewUrl ? <img width={'500'} height="500" src={imagePreviewUrl} alt="preiverw" /> : ''}
+                            </div>
+                        </div>
 
-inputProps={{ style: { color: 'black' } }}
-                                        />
-                                    );
-                                }}
-                                name="username"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.username?.message}</p>
-                        </Box>
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <FormControl sx={{ m: 1, minWidth: 120 }} className="mt-3 w-full" fullWidth>
-                                            <InputLabel id="demo-simple-select-helper-label">Quyền</InputLabel>
-                                            <Select
-                                                labelId="demo-simple-select-helper-label"
-                                                id="demo-simple-select-helper"
-                                                label="Quyền"
-                                                {...field}
-                                                fullWidth
-                                                required
-                                                error={!!formState.errors?.role}
-                                            >
-                                                <MenuItem value="">
-                                                    <em>None</em>
-                                                </MenuItem>
-                                                <MenuItem value={`super_admin`}>Quản trị viên</MenuItem>
-                                                <MenuItem value={'admin'}>Nhân viên</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    );
-                                }}
-                                name="role"
-                                control={control}
-                                className="w-full"
-                                style={{ width: '100%' }}
-                            />
-                            <p className="text-red">{errors?.role?.message}</p>
-                        </Box>
+                        <p className="text-red">{errors?.userInfo?.email?.message}</p>
                     </div>
                 </div>
+
                 <div className="container flex justify-end p-3 mt-5">
                     <button
                         type="button "

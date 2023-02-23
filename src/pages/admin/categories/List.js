@@ -27,6 +27,7 @@ import { visuallyHidden } from '@mui/utils';
 import moment from 'moment';
 
 import Loading from '../../../components/Loading';
+import { Autocomplete, MenuItem, Select, TextField } from '@mui/material';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -140,8 +141,19 @@ function EnhancedTableToolbar(props) {
     );
 }
 
-const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading }) => {
-    useEffect(() => {}, [JSON.stringify(columns)]);
+const List = ({
+    columns,
+    dataSource,
+    setPageStatus,
+    searchValues,
+    setSearchValues,
+    loading,
+    handleChangeParentCategory,
+    parentCategories
+}) => {
+    useEffect(() => {
+        console.log(`parentCategories`, parentCategories)
+    }, [JSON.stringify(columns)]);
 
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
@@ -398,33 +410,21 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                 </div>
             </div>
             <div className="mt-6 md:flex md:items-center md:justify-between">
-                <div className="inline-flex overflow-hidden bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700">
-                    <button
-                        onClick={() => {
-                            setSearchValues({ ...searchValues, role: null });
-                        }}
-                        className={!searchValues?.role ? constants.TAB_ACTIVE_CLASS.ACTIVE : constants.TAB_ACTIVE_CLASS.INACTIVE}
-                    >
-                        Tất cả
-                    </button>
-                    <button
-                        onClick={() => {
-                            setSearchValues({ ...searchValues, role: 'super_admin' });
-                        }}
-                        className={
-                            searchValues?.role === 'super_admin' ? constants.TAB_ACTIVE_CLASS.ACTIVE : constants.TAB_ACTIVE_CLASS.INACTIVE
-                        }
-                    >
-                        Quản trị viên
-                    </button>
-                    <button
-                        onClick={() => {
-                            setSearchValues({ ...searchValues, role: 'admin' });
-                        }}
-                        className={searchValues?.role === 'admin' ? constants.TAB_ACTIVE_CLASS.ACTIVE : constants.TAB_ACTIVE_CLASS.INACTIVE}
-                    >
-                        Nhân viên
-                    </button>
+                <div className="inline-flex overflow-hidden   border-none divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700 ">
+                    <div className="flex flex-col py-3 ">
+                        <Autocomplete
+                            disablePortal
+                            id="combo-box-demo"
+                            options={[{ label: 'Tất cả', id: 'null' }].concat(parentCategories)}
+                            sx={{ width: 300 }}
+                            onChange={(e, value) => {
+                                handleChangeParentCategory(value);
+                            }}
+                            renderInput={(params) => (
+                                <TextField style={{ padding: '5px' }} className="auto_input" {...params} label="Loại danh mục" />
+                            )}
+                        />
+                    </div>
                 </div>
                 <div className="relative flex items-center mt-4 md:mt-0">
                     <span className="absolute">
@@ -469,7 +469,16 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                             />
 
                             <TableBody>
-                            {loading  ? ( <TableRow> <TableCell colSpan={10}><Loading/></TableCell> </TableRow> ) : ''}
+                                {loading ? (
+                                    <TableRow>
+                                        {' '}
+                                        <TableCell colSpan={10}>
+                                            <Loading />
+                                        </TableCell>{' '}
+                                    </TableRow>
+                                ) : (
+                                    ''
+                                )}
                                 {stableSort(dataSource?.data, getComparator(order, orderBy))
                                     // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row, index) => {
@@ -503,13 +512,6 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                                                         </TableCell>
                                                     );
                                                 })}
-                                                {/* <TableCell component="th" id={labelId} scope="row" padding="none">
-                                                        {row.name}
-                                                    </TableCell>
-                                                    <TableCell align="right">{row.calories}</TableCell>
-                                                    <TableCell align="right">{row.fat}</TableCell>
-                                                    <TableCell align="right">{row.carbs}</TableCell>
-                                                    <TableCell align="right">{row.protein}</TableCell> */}
                                             </TableRow>
                                         );
                                     })}
@@ -521,8 +523,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                                     >
                                         <TableCell colSpan={6} />
                                     </TableRow>
-                                )} 
-                              
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>

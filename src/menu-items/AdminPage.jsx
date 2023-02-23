@@ -44,14 +44,6 @@ const pages = {
     type: 'group',
     children: [   
         {
-            id: 'admin-users',
-            type: 'item',
-            title: 'Quản lý tài khoản',
-            icon: icons.ShoppingCartOutlined,
-            url: '/admin/users',
-            target: false, 
-        },
-        {
             id: 'admin-categories',
             type: 'item',
             title: 'Cấu hình danh mục',
@@ -59,6 +51,14 @@ const pages = {
             url: '/admin/categories',
             target: false, 
         },
+        {
+            id: 'admin-users',
+            type: 'item',
+            title: 'Quản lý tài khoản',
+            icon: icons.ShoppingCartOutlined,
+            url: '/admin/users',
+            target: false, 
+        }, 
         {
             id: 'admin-config',
             type: 'item',
