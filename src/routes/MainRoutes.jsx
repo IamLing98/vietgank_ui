@@ -78,6 +78,7 @@ const ChapterListTable = Loadable(lazy(() => import('pages/chapters/list/Chapter
 const UserManagement = Loadable(lazy(() => import('pages/admin/users')));
 const Settings = Loadable(lazy(() => import('pages/admin/settings')));
 const Categories = Loadable(lazy(() => import('pages/admin/categories')));
+const ProductManagement = Loadable(lazy(() => import('pages/management/products')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -176,6 +177,16 @@ const MainRoutes = {
                     path: 'add-new-product',
                     element: <AddNewProduct />
                 }
+            ]
+        },
+        {
+            path: 'management',
+            children: [
+                {
+                    path: 'products',
+                    element: <ProductManagement />
+                },
+                 
             ]
         },
         {

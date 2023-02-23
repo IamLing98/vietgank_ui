@@ -48,7 +48,7 @@ const pages = {
             type: 'item',
             title: 'Quản lý sản phẩm',
             icon: icons.ShoppingCartOutlined,
-            url: '/e-commerce/product-list',
+            url: '/management/products',
             target: false, 
         },
         // {
