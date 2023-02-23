@@ -13,7 +13,7 @@ import { EditOutlined, ProfileOutlined, LogoutOutlined, UserOutlined, WalletOutl
 const ProfileTab = ({ handleLogout }) => {
     const theme = useTheme();
 
-    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [selectedIndex, setSelectedIndex] = useState(null);
     const handleListItemClick = (event, index) => {
         setSelectedIndex(index);
     };
@@ -24,32 +24,13 @@ const ProfileTab = ({ handleLogout }) => {
                 <ListItemIcon>
                     <EditOutlined />
                 </ListItemIcon>
-                <ListItemText primary="Edit Profile" />
-            </ListItemButton>
-            <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1)}>
-                <ListItemIcon>
-                    <UserOutlined />
-                </ListItemIcon>
-                <ListItemText primary="View Profile" />
-            </ListItemButton>
-
-            <ListItemButton selected={selectedIndex === 3} onClick={(event) => handleListItemClick(event, 3)}>
-                <ListItemIcon>
-                    <ProfileOutlined />
-                </ListItemIcon>
-                <ListItemText primary="Social Profile" />
-            </ListItemButton>
-            <ListItemButton selected={selectedIndex === 4} onClick={(event) => handleListItemClick(event, 4)}>
-                <ListItemIcon>
-                    <WalletOutlined />
-                </ListItemIcon>
-                <ListItemText primary="Billing" />
-            </ListItemButton>
-            <ListItemButton selected={selectedIndex === 2} onClick={handleLogout}>
+                <ListItemText primary="Thông tin cá nhân" />
+            </ListItemButton> 
+            <ListItemButton selected={selectedIndex === 1} onClick={handleLogout}>
                 <ListItemIcon>
                     <LogoutOutlined />
                 </ListItemIcon>
-                <ListItemText primary="Logout" />
+                <ListItemText primary="Đăng xuất" />
             </ListItemButton>
         </List>
     );

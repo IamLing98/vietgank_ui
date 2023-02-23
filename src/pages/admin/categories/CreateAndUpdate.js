@@ -4,7 +4,7 @@ import constants from 'utils/constants';
 import { useForm, Controller } from 'react-hook-form';
 
 import * as yup from 'yup';
-import { FormControl, InputLabel, Typography } from '@mui/material';
+import { Autocomplete, FormControl, InputLabel, Typography } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 // import TextField from '@mui/material/TextField';
@@ -43,17 +43,13 @@ const initDefaultValues = {
     role: null
 };
 
-export default ({ onSubmit, pageStatus, setPageStatus }) => {
+export default ({ onSubmit, pageStatus, setPageStatus, parentCategories }) => {
     const [defaultValues, setDefaultValues] = useState({ ...initDefaultValues });
 
     const schema = yup.object().shape({
-        userInfo: yup.object().shape({
-            fullName: yup.string().nullable().required('Trường thông tin bắt buộc'),
-            email: yup.string().nullable().required('Trường thông tin bắt buộc').email('Định dạng mail không đúng'),
-            phoneNumber: yup.string().nullable().required('Trường thông tin bắt buộc')
-        }),
-        username: yup.string().nullable().required('Trường thông tin bắt buộc'),
-        role: yup.string().nullable().required('Trường thông tin bắt buộc')
+        parentCategoryId: yup.object().nullable().required('Trường thông tin bắt buộc'),
+        categoryName: yup.string().nullable().required('Trường thông tin bắt buộc'),
+        categoryCode: yup.string().nullable().required('Trường thông tin bắt buộc')
     });
 
     const {
@@ -69,17 +65,19 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
     });
 
     // useEffect(() => {
-    //     if (pageStatus?.status === constants.PAGE_STATUS.UPDATE.status) { 
+    //     if (pageStatus?.status === constants.PAGE_STATUS.UPDATE.status) {
     //         setDefaultValues(pageStatus?.record);
     //     }
-    // }, [JSON.stringify(pageStatus)]); 
+    // }, [JSON.stringify(pageStatus)]);
 
     return (
         <>
             <div className="py-3">
                 <div className="flex items-center gap-x-3">
                     <h2 className="text-lg font-medium text-gray-800 dark:text-white">
-                        {pageStatus?.status === constants?.PAGE_STATUS.CREATE.status ? `Tạo mới tài khoản` : `Cập nhật tài khoản (${pageStatus?.record?.username})`} 
+                        {pageStatus?.status === constants?.PAGE_STATUS.CREATE.status
+                            ? `Tạo mới danh mục`
+                            : `Cập nhật danh mục (${pageStatus?.record?.categoryName})`}
                     </h2>
                 </div>
             </div>
@@ -87,30 +85,61 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
             <form>
                 <div className="container bg-white p-3">
                     <div className="flex items-center gap-x-3">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin cá nhân</h3>
+                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin danh mục</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <Box>
                             <Controller
                                 render={({ field, formState, fieldState }) => {
                                     return (
+                                        <Autocomplete
+                                            disablePortal
+                                            id="combo-box-demo"
+                                            options={[{ label: 'Danh mục cha', id: 'null' }].concat(parentCategories)}
+                                            className=" mt-3  w-full"
+                                            getOptionLabel={(option) => option.label}
+                                            {...field}
+                                            onChange={(e, value)=>{
+                                                field.onChange(value)
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    style={{ padding: '5px' }}
+                                                    className="auto_input"
+                                                    {...params}
+                                                    label="Loại danh mục"
+                                                    error={!!formState.errors?.parentCategoryId}
+                                                />
+                                            )}
+                                            disableClearable
+                                        />
+                                    );
+                                }}
+                                name="parentCategoryId"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.parentCategoryId?.message}</p>
+                        </Box>
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
                                         <TextField
                                             {...field}
-                                            label="Họ và tên"
-                                            error={!!formState.errors?.userInfo?.fullName}
-                                            placeholder="Họ và tên"
+                                            label="Mã danh mục"
+                                            error={!!formState.errors?.categoryCode}
+                                            placeholder="Mã danh mục"
                                             className="mt-3 w-full"
                                             type="text"
-                                            variant="outlined"
                                             required
                                             inputProps={{ maxLength: 50 }}
                                         />
                                     );
                                 }}
-                                name="userInfo.fullName"
+                                name="categoryCode"
                                 control={control}
                             />
-                            <p className="text-red">{errors?.userInfo?.fullName?.message}</p>
+                            <p className="text-red">{errors?.categoryCode?.message}</p>
                         </Box>
                         <Box>
                             <Controller
@@ -118,9 +147,9 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
                                     return (
                                         <TextField
                                             {...field}
-                                            label="Số điện thoại"
-                                            error={!!formState.errors?.userInfo?.phoneNumber}
-                                            placeholder="Số điện thoại"
+                                            label="Tên danh mục"
+                                            error={!!formState.errors?.categoryName}
+                                            placeholder="Tên danh mục"
                                             className="mt-3 w-full"
                                             type="text"
                                             required
@@ -128,94 +157,10 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
                                         />
                                     );
                                 }}
-                                name="userInfo.phoneNumber"
+                                name="categoryName"
                                 control={control}
                             />
-                            <p className="text-red">{errors?.userInfo?.phoneNumber?.message}</p>
-                        </Box>
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Email"
-                                            error={!!formState.errors?.userInfo?.email}
-                                            placeholder="Email"
-                                            className="mt-3 w-full"
-                                            type="email"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                        />
-                                    );
-                                }}
-                                name="userInfo.email"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.userInfo?.email?.message}</p>
-                        </Box>
-                    </div>
-                </div>
-                <div className="container bg-white p-3 mt-5">
-                    <div className="flex items-center gap-x-3">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin tài khoản</h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Tài khoản"
-                                            error={!!formState.errors?.username}
-                                            placeholder="Tài khoản"
-                                            className="mt-3 w-full"
-                                            type="text"
-                                            variant="outlined"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                            disabled={pageStatus?.status === constants?.PAGE_STATUS.UPDATE.status }
-
-inputProps={{ style: { color: 'black' } }}
-                                        />
-                                    );
-                                }}
-                                name="username"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.username?.message}</p>
-                        </Box>
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <FormControl sx={{ m: 1, minWidth: 120 }} className="mt-3 w-full" fullWidth>
-                                            <InputLabel id="demo-simple-select-helper-label">Quyền</InputLabel>
-                                            <Select
-                                                labelId="demo-simple-select-helper-label"
-                                                id="demo-simple-select-helper"
-                                                label="Quyền"
-                                                {...field}
-                                                fullWidth
-                                                required
-                                                error={!!formState.errors?.role}
-                                            >
-                                                <MenuItem value="">
-                                                    <em>None</em>
-                                                </MenuItem>
-                                                <MenuItem value={`super_admin`}>Quản trị viên</MenuItem>
-                                                <MenuItem value={'admin'}>Nhân viên</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    );
-                                }}
-                                name="role"
-                                control={control}
-                                className="w-full"
-                                style={{ width: '100%' }}
-                            />
-                            <p className="text-red">{errors?.role?.message}</p>
+                            <p className="text-red">{errors?.userInfo?.categoryName}</p>
                         </Box>
                     </div>
                 </div>
@@ -224,6 +169,7 @@ inputProps={{ style: { color: 'black' } }}
                         type="button "
                         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         onClick={handleSubmit(function (values) {
+                            console.log(`values`, values)
                             onSubmit(dataUtils.camelToSnakeCase(values));
                         })}
                     >

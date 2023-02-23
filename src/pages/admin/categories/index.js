@@ -16,6 +16,8 @@ export default function BasicBreadcrumbs() {
 
     const [columns, setColumns] = React.useState(data.columns);
 
+    const [parentId, setParentId] = useState({ label: 'Tất cả', id: 'null' });
+
     const [dataSource, setDataSource] = useState({
         data: [],
         total: 0
@@ -26,7 +28,7 @@ export default function BasicBreadcrumbs() {
     const [searchValues, setSearchValues] = useState({
         page: 0,
         size: 10,
-        parent_category_id: -1
+        parent_category_id: '$ne=null'
     });
 
     const [parentCategories, setParentCategories] = useState([]);
@@ -58,18 +60,18 @@ export default function BasicBreadcrumbs() {
     async function getParentCategories() {
         await setLoading(true);
         axios
-            .get(`/api/category?parent_category_id=-1`)
+            .get(`/api/category/parent`)
             .then(async (response) => {
                 let data = response.data;
-                if (data?.success && Array.isArray(data?.data)) {
+                if (Array.isArray(data?.data)) {
                     let parents = data?.data?.map((item) => {
                         let newItem = dataUtils?.snakeToCamelCase(item);
                         return {
-                            id: newItem?._id,
+                            id: newItem?.categoryCode,
                             label: newItem?.categoryName
                         };
                     });
-                    console.log(`parent`, parent)
+                    console.log(`parent`, parent);
                     setParentCategories(parents);
                 }
                 await setLoading(false);
@@ -83,13 +85,22 @@ export default function BasicBreadcrumbs() {
 
     useEffect(() => {
         getDataSource(searchValues);
-        getParentCategories(searchValues);
     }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
 
-    async function onCreate(values) {
-        values.password = constants.AUTH.P_DEFAULT;
+    useEffect(() => { 
+        getParentCategories(searchValues);
+    }, [JSON.stringify(pageStatus)]);
+
+    async function onCreate(values) {  
+        let newValues = {...values}
+        if(newValues?.parent_category_id?.id === 'null'){
+              newValues.parent_category_id = null
+        }
+        else{
+            newValues.parent_category_code =  newValues?.parent_category_id?.id
+        }
         await axios
-            .post('/api/user', values)
+            .post('/api/category', newValues)
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Tạo mới thành công');
@@ -139,7 +150,8 @@ export default function BasicBreadcrumbs() {
     }
 
     function handleChangeParentCategory(value) {
-        console.log(value);
+        setSearchValues({ ...searchValues, parent_category_id: value?.id });
+        setParentId(value);
     }
 
     return (
@@ -156,7 +168,8 @@ export default function BasicBreadcrumbs() {
                             setSearchValues={setSearchValues}
                             searchValues={searchValues}
                             handleChangeParentCategory={handleChangeParentCategory}
-                            parentCategories={parentCategories }
+                            parentCategories={parentCategories}
+                            parentId={parentId}
                         />
                         <DeleteConfirm
                             pageStatus={pageStatus}
@@ -169,7 +182,7 @@ export default function BasicBreadcrumbs() {
                     ''
                 )}
                 {pageStatus.status === constants.PAGE_STATUS.CREATE.status ? (
-                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} />
+                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} parentCategories={parentCategories}/>
                 ) : (
                     ''
                 )}

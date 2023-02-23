@@ -77,7 +77,7 @@ const AuthLogin = () => {
                         await axios.post('/signin', values).then(response => {
                             let data = response.data
                             if (data?.success) {
-                                dispatch(loginSuccess({ token: data?.data?.access_token }));
+                                dispatch(loginSuccess({ token: data?.data?.access_token, userInfo:data?.data?.user_info  }));
                                 navigate('/dashboard/default');
                             } else {
                                 toast.error('Lỗi đăng nhập')

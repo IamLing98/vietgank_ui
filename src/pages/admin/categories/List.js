@@ -120,7 +120,7 @@ function EnhancedTableToolbar(props) {
                 </Typography>
             ) : (
                 <Typography sx={{ flex: '1 1 100%' }} variant="h6" id="tableTitle" component="div">
-                    Danh sách tài khoản
+                    Danh sách danh mục
                 </Typography>
             )}
 
@@ -149,10 +149,11 @@ const List = ({
     setSearchValues,
     loading,
     handleChangeParentCategory,
-    parentCategories
+    parentCategories,
+    parentId
 }) => {
     useEffect(() => {
-        console.log(`parentCategories`, parentCategories)
+        console.log(`parentCategories`, parentCategories);
     }, [JSON.stringify(columns)]);
 
     const [order, setOrder] = React.useState('asc');
@@ -209,60 +210,25 @@ const List = ({
 
     const headCells = [
         {
-            id: 'username',
+            id: 'parent_category_code',
             numeric: false,
             disablePadding: true,
-            label: 'TÀI KHOẢN',
+            label: 'loại danh mục',
             render: (value, record, index) => {
-                return <h3>{value}</h3>;
+                return <h3>{parentCategories?.find((item) => item.categoryCode === value)?.label}</h3>;
             }
         },
         {
-            id: 'role',
+            id: 'categoryName',
             numeric: false,
             disablePadding: true,
-            label: 'QUYỀN',
-            render: (value, record, index) => {
-                if (value === 'super_admin') {
-                    return (
-                        <span className="inline-block whitespace-nowrap rounded-[0.27rem] bg-warning-100 px-[0.65em] pt-[0.35em] pb-[0.25em] text-center align-baseline text-[0.75em] font-bold leading-none text-warning-800">
-                            Quản trị viên
-                        </span>
-                    );
-                } else
-                    return (
-                        <span class="inline-block whitespace-nowrap rounded-[0.27rem] bg-info-100 px-[0.65em] pt-[0.35em] pb-[0.25em] text-center align-baseline text-[0.75em] font-bold leading-none text-info-800">
-                            Nhân viên
-                        </span>
-                    );
-            }
+            label: 'tên danh mục'
         },
         {
-            id: 'userInfo',
+            id: 'categoryCode',
             numeric: false,
             disablePadding: true,
-            label: 'HỌ VÀ TÊN',
-            render: (value, record, index) => {
-                return <h3>{record?.userInfo?.fullName}</h3>;
-            }
-        },
-        {
-            id: 'userInfo',
-            numeric: false,
-            disablePadding: true,
-            label: 'Email',
-            render: (value, record, index) => {
-                return <h3>{record?.userInfo?.email}</h3>;
-            }
-        },
-        {
-            id: 'phoneNumber',
-            numeric: false,
-            disablePadding: true,
-            label: 'SĐT',
-            render: (value, record, index) => {
-                return <h3>{record?.userInfo?.phoneNumber}</h3>;
-            }
+            label: 'mã danh mục'
         },
         {
             id: 'created',
@@ -274,7 +240,7 @@ const List = ({
             }
         },
         {
-            id: 'phoneNumber',
+            id: 'updated',
             numeric: false,
             disablePadding: true,
             label: 'Ngày cập nhật',
@@ -417,12 +383,16 @@ const List = ({
                             id="combo-box-demo"
                             options={[{ label: 'Tất cả', id: 'null' }].concat(parentCategories)}
                             sx={{ width: 300 }}
+                            getOptionLabel={(option) => option.label}
+                            defaultValue={{ label: 'Tất cả', id: 'null' }}
                             onChange={(e, value) => {
                                 handleChangeParentCategory(value);
                             }}
+                            value={parentId}
                             renderInput={(params) => (
                                 <TextField style={{ padding: '5px' }} className="auto_input" {...params} label="Loại danh mục" />
                             )}
+                            disableClearable
                         />
                     </div>
                 </div>

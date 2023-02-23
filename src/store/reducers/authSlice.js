@@ -22,13 +22,17 @@ const auth = createSlice({
     reducers: {
         loginSuccess(state, action) {
             state.isLoggedIn = true;
-            localStorage.setItem(constants.AUTH.TOKEN, action?.payload?.token); 
+            state.userInfo = action?.payload?.userInfo
+            localStorage.setItem(constants.AUTH.TOKEN, action?.payload?.token);  
             let token = localStorage.getItem(constants.AUTH.TOKEN);
             axios.defaults.headers.common['Authorization'] = token;
+            localStorage.setItem(constants.AUTH.USER_INFO, JSON.stringify(action?.payload?.userInfo)); 
         },
         logout(state, action) {
             localStorage.removeItem(constants.AUTH.TOKEN);
+            localStorage.removeItem(constants.AUTH.USER_INFO);
             state.isLoggedIn = false;
+            state.userInfo={}
         }
     }
 });

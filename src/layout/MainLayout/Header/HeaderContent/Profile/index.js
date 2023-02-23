@@ -31,6 +31,7 @@ import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons
 import { useDispatch } from 'react-redux';
 import { logout } from 'store/reducers/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -88,6 +89,10 @@ const Profile = () => {
 
     const iconBackColorOpen = 'grey.300';
 
+    const authReducer = useSelector((store) => store?.auth);
+
+    console.log(`Auth reducer`, authReducer);
+
     return (
         <Box sx={{ flexShrink: 0, ml: 0.75 }}>
             <ButtonBase
@@ -105,7 +110,11 @@ const Profile = () => {
             >
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }} data-tut="reactour__profile">
                     <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
-                    <Typography variant="subtitle1">John Doe</Typography>
+                    <Typography variant="subtitle1">
+                        {authReducer?.userInfo?.user_info?.full_name
+                            ? authReducer?.userInfo?.user_info?.full_name
+                            : authReducer?.userInfo?.username}
+                    </Typography>
                 </Stack>
             </ButtonBase>
             <Popper
@@ -148,9 +157,13 @@ const Profile = () => {
                                                     <Stack direction="row" spacing={1.25} alignItems="center">
                                                         <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
                                                         <Stack>
-                                                            <Typography variant="h6">John Doe</Typography>
+                                                            <Typography variant="h6"> 
+                                                                {authReducer?.userInfo?.user_info?.full_name
+                                                                    ? authReducer?.userInfo?.user_info?.full_name
+                                                                    : authReducer?.userInfo?.username}
+                                                            </Typography>
                                                             <Typography variant="body2" color="textSecondary">
-                                                                UI/UX Designer
+                                                                {authReducer?.userInfo?.role}
                                                             </Typography>
                                                         </Stack>
                                                     </Stack>
@@ -163,46 +176,7 @@ const Profile = () => {
                                             </Grid>
                                         </CardContent>
                                         {open && (
-                                            <>
-                                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                                    <Tabs
-                                                        variant="fullWidth"
-                                                        value={value}
-                                                        onChange={handleChange}
-                                                        aria-label="profile tabs"
-                                                    >
-                                                        <Tab
-                                                            sx={{
-                                                                display: 'flex',
-                                                                flexDirection: 'row',
-                                                                justifyContent: 'center',
-                                                                alignItems: 'center',
-                                                                textTransform: 'capitalize'
-                                                            }}
-                                                            icon={<UserOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
-                                                            label="Profile"
-                                                            {...a11yProps(0)}
-                                                        />
-                                                        <Tab
-                                                            sx={{
-                                                                display: 'flex',
-                                                                flexDirection: 'row',
-                                                                justifyContent: 'center',
-                                                                alignItems: 'center',
-                                                                textTransform: 'capitalize'
-                                                            }}
-                                                            icon={<SettingOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
-                                                            label="Setting"
-                                                            {...a11yProps(1)}
-                                                        />
-                                                    </Tabs>
-                                                </Box>
-                                                <TabPanel value={value} index={0} dir={theme.direction}>
-                                                    <ProfileTab handleLogout={handleLogout} />
-                                                </TabPanel>
-                                                <TabPanel value={value} index={1} dir={theme.direction}>
-                                                    <SettingTab />
-                                                </TabPanel>
+                                            <> <ProfileTab handleLogout={handleLogout} />
                                             </>
                                         )}
                                     </MainCard>
