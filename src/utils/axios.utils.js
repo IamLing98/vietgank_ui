@@ -1,9 +1,13 @@
+import React from 'react'
+
 import axios from "axios";
 // import { toast } from "react-toastify";
 import constants from "./constants";
 import {store} from "../store/index";
-import { logout } from "store/reducers/authSlice";
-// import { logout } from "../redux/reducers/authReducer";
+import { logout } from "store/reducers/authSlice"; 
+import { useNavigate } from 'react-router';
+
+
 
 console.log(process.env.REACT_APP_BASE_URL)
 function axiosInterceptor() { 
@@ -40,8 +44,8 @@ function axiosInterceptor() {
     },
     function (error) {
       if (error.response) {
-        if (error.response.status === 401) {
-          store.dispatch(logout())
+        if (error.response.status === 401 || error.response.status === 400) { 
+          store.dispatch(logout()) 
         }
       }
       // Any status codes that falls outside the range of 2xx cause this function to trigger

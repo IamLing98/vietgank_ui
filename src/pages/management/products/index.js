@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import data from './data';
-import List from './List';
+import List from './list';
 import Breadcrumbs from '../../../components/Breadcrum';
 import constants from 'utils/constants';
 import CreateAndUpdate from './CreateAndUpdate';
@@ -23,10 +23,15 @@ export default function BasicBreadcrumbs() {
 
     const [pageStatus, setPageStatus] = useState({ ...constants.PAGE_STATUS.LIST });
 
+    const [categories, setCategories] = useState([])
+
+    const [options, setOptions] = useState({})
+
     const [searchValues, setSearchValues] = useState({
         page: 0,
         size: 10,
-        is_deleted: 'false'
+        is_deleted: 'false',
+        serviceType: 'SHOPPING'
     });
 
     async function getDataSource(searchValues) {
@@ -36,7 +41,7 @@ export default function BasicBreadcrumbs() {
         object.page = object.page + 1;
         const qs = '?' + new URLSearchParams(dataUtils?.removeNullOrUndefined(object)).toString();
         axios
-            .get(`/api/user${qs}`)
+            .get(`/api/product${qs}`)
             .then(async (response) => {
                 let data = response.data;
                 if (data?.success) {
@@ -49,19 +54,39 @@ export default function BasicBreadcrumbs() {
                 return data.dataSource;
             })
             .catch((err) => {
-                setDataSource({ data: [], total: 0 }); 
+                setDataSource({ data: [], total: 0 });
                 setLoading(false);
             });
     }
 
+
+
+    const fetchCategories = async () => {
+        axios.get('/api/category/tree-view?category_code=LOAI_QUAN_AO').then((response) => {
+            let children = response.data.data[0]?.children 
+            setCategories(children)
+            let newOptions = {}
+            for(let i = 0 ; i < children?.length; i++){
+                let child = children[i];
+                newOptions[child[i]?.category_code] = child[i].children
+                 
+            }
+            setOptions({...newOptions})
+        }).catch(error => {
+            setCategories([])
+        });
+    };
+
+
     useEffect(() => {
         getDataSource(searchValues);
+        fetchCategories()
     }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
 
     async function onCreate(values) {
         values.password = constants.AUTH.P_DEFAULT;
         await axios
-            .post('/api/user', values)
+            .post('/api/product', values)
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Tạo mới thành công');
@@ -95,7 +120,7 @@ export default function BasicBreadcrumbs() {
     async function onDelete(values) {
         console.log(`Values`, values);
         await axios
-            .delete(`/api/user?user_id=${values?._id}`)
+            .delete(`/api/product?product_id=${values?._id}`)
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Xóa thành công');
@@ -123,6 +148,7 @@ export default function BasicBreadcrumbs() {
                             dataSource={dataSource}
                             setSearchValues={setSearchValues}
                             searchValues={searchValues}
+                            categories={categories}
                         />
                         <DeleteConfirm
                             pageStatus={pageStatus}
@@ -135,7 +161,7 @@ export default function BasicBreadcrumbs() {
                     ''
                 )}
                 {pageStatus.status === constants.PAGE_STATUS.CREATE.status ? (
-                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} />
+                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} options={options}/>
                 ) : (
                     ''
                 )}

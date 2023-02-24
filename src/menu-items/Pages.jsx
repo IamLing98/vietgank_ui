@@ -51,6 +51,14 @@ const pages = {
             url: '/management/products',
             target: false, 
         },
+        {
+            id: 'e-commerce2',
+            type: 'item',
+            title: 'Quản lý địa điểm',
+            icon: icons.ShoppingCartOutlined,
+            url: '/management/places',
+            target: false, 
+        },
         // {
         //     id: 'statistic',
         //     title: '统计数据',

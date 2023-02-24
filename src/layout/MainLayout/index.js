@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // material-ui
@@ -22,7 +22,11 @@ const MainLayout = () => {
     const matchDownLG = useMediaQuery(theme.breakpoints.down('xl'));
     const dispatch = useDispatch();
 
+    const navigate = useNavigate()
+
     const { drawerOpen } = useSelector((state) => state.menu);
+
+    const authReducer = useSelector((store) => store?.auth);
 
     // drawer toggler
     const [open, setOpen] = useState(drawerOpen);
@@ -43,6 +47,18 @@ const MainLayout = () => {
         if (open !== drawerOpen) setOpen(drawerOpen);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [drawerOpen]);
+
+    useEffect(() => {
+        if (open !== drawerOpen) setOpen(drawerOpen);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [drawerOpen]);
+
+    useEffect(() => {
+        console.log(`Main router: `, authReducer);
+        if(!authReducer?.isLoggedIn ){
+            navigate('/login')
+        }
+    }, [authReducer?.isLoggedIn]);
 
     return (
         <Box sx={{ display: 'flex', width: '100%' }}>

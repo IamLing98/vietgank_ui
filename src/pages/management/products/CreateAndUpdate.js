@@ -8,6 +8,8 @@ import { FormControl, InputLabel, Typography } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 // import TextField from '@mui/material/TextField';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 import DateFnsUtils from '@date-io/date-fns';
 import {
@@ -34,26 +36,29 @@ import DatePicker from '@mui/lab/DatePicker';
 import dataUtils from 'utils/dataUtils';
 
 const initDefaultValues = {
-    userInfo: {
-        fullName: null,
-        email: null,
-        phoneNumber: null
-    },
-    username: null,
-    role: null
+    productInfo: {
+        productCode: null, 
+        quantity: null,
+        size: [],
+        tags: [],
+        productName: null
+    }, 
+    productType: null,
+    serviceType: 'CLOTHES'
 };
 
 export default ({ onSubmit, pageStatus, setPageStatus }) => {
     const [defaultValues, setDefaultValues] = useState({ ...initDefaultValues });
 
     const schema = yup.object().shape({
-        userInfo: yup.object().shape({
-            fullName: yup.string().nullable().required('Trường thông tin bắt buộc'),
-            email: yup.string().nullable().required('Trường thông tin bắt buộc').email('Định dạng mail không đúng'),
-            phoneNumber: yup.string().nullable().required('Trường thông tin bắt buộc')
-        }),
-        username: yup.string().nullable().required('Trường thông tin bắt buộc'),
-        role: yup.string().nullable().required('Trường thông tin bắt buộc')
+        productInfo: yup.object().shape({
+            productCode: yup.string().nullable().required('Trường thông tin bắt buộc'),
+            quantity: yup.string().nullable().required('Trường thông tin bắt buộc'),
+            size: yup.array().required('Trường thông tin bắt buộc'),
+            tags: yup.array().required('Trường thông tin bắt buộc'),
+            productName: yup.string().nullable().required('Trường thông tin bắt buộc')
+        }), 
+        productType: yup.string().nullable().required('Trường thông tin bắt buộc'), 
     });
 
     const {
@@ -69,17 +74,19 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
     });
 
     // useEffect(() => {
-    //     if (pageStatus?.status === constants.PAGE_STATUS.UPDATE.status) { 
+    //     if (pageStatus?.status === constants.PAGE_STATUS.UPDATE.status) {
     //         setDefaultValues(pageStatus?.record);
     //     }
-    // }, [JSON.stringify(pageStatus)]); 
+    // }, [JSON.stringify(pageStatus)]);
 
     return (
         <>
             <div className="py-3">
                 <div className="flex items-center gap-x-3">
                     <h2 className="text-lg font-medium text-gray-800 dark:text-white">
-                        {pageStatus?.status === constants?.PAGE_STATUS.CREATE.status ? `Tạo mới tài khoản` : `Cập nhật tài khoản (${pageStatus?.record?.username})`} 
+                        {pageStatus?.status === constants?.PAGE_STATUS.CREATE.status
+                            ? `Tạo mới sản phẩm`
+                            : `Cập nhật sản phẩm (${pageStatus?.record?.username})`}
                     </h2>
                 </div>
             </div>
@@ -87,119 +94,26 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
             <form>
                 <div className="container bg-white p-3">
                     <div className="flex items-center gap-x-3">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin cá nhân</h3>
+                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin sản phẩm</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <Box>
                             <Controller
                                 render={({ field, formState, fieldState }) => {
                                     return (
-                                        <TextField
-                                            {...field}
-                                            label="Họ và tên"
-                                            error={!!formState.errors?.userInfo?.fullName}
-                                            placeholder="Họ và tên"
-                                            className="mt-3 w-full"
-                                            type="text"
-                                            variant="outlined"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                        />
-                                    );
-                                }}
-                                name="userInfo.fullName"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.userInfo?.fullName?.message}</p>
-                        </Box>
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Số điện thoại"
-                                            error={!!formState.errors?.userInfo?.phoneNumber}
-                                            placeholder="Số điện thoại"
-                                            className="mt-3 w-full"
-                                            type="text"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                        />
-                                    );
-                                }}
-                                name="userInfo.phoneNumber"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.userInfo?.phoneNumber?.message}</p>
-                        </Box>
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Email"
-                                            error={!!formState.errors?.userInfo?.email}
-                                            placeholder="Email"
-                                            className="mt-3 w-full"
-                                            type="email"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                        />
-                                    );
-                                }}
-                                name="userInfo.email"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.userInfo?.email?.message}</p>
-                        </Box>
-                    </div>
-                </div>
-                <div className="container bg-white p-3 mt-5">
-                    <div className="flex items-center gap-x-3">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Thông tin tài khoản</h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <TextField
-                                            {...field}
-                                            label="Tài khoản"
-                                            error={!!formState.errors?.username}
-                                            placeholder="Tài khoản"
-                                            className="mt-3 w-full"
-                                            type="text"
-                                            variant="outlined"
-                                            required
-                                            inputProps={{ maxLength: 50 }}
-                                            disabled={pageStatus?.status === constants?.PAGE_STATUS.UPDATE.status }
-
-inputProps={{ style: { color: 'black' } }}
-                                        />
-                                    );
-                                }}
-                                name="username"
-                                control={control}
-                            />
-                            <p className="text-red">{errors?.username?.message}</p>
-                        </Box>
-                        <Box>
-                            <Controller
-                                render={({ field, formState, fieldState }) => {
-                                    return (
-                                        <FormControl sx={{ m: 1, minWidth: 120 }} className="mt-3 w-full" fullWidth>
-                                            <InputLabel id="demo-simple-select-helper-label">Quyền</InputLabel>
+                                        <FormControl sx={{  minWidth: 120 }} className="mt-3 w-full" fullWidth>
+                                            <InputLabel required id="demo-simple-select-helper-label">
+                                                Loại sản phẩm
+                                            </InputLabel>{' '}
                                             <Select
                                                 labelId="demo-simple-select-helper-label"
                                                 id="demo-simple-select-helper"
-                                                label="Quyền"
+                                                label="Loại sản phẩm"
                                                 {...field}
                                                 fullWidth
                                                 required
-                                                error={!!formState.errors?.role}
+                                                defaultValue={[]}
+                                                error={!!formState.errors?.productType}
                                             >
                                                 <MenuItem value="">
                                                     <em>None</em>
@@ -210,12 +124,174 @@ inputProps={{ style: { color: 'black' } }}
                                         </FormControl>
                                     );
                                 }}
-                                name="role"
+                                name="productType"
                                 control={control}
-                                className="w-full"
-                                style={{ width: '100%' }}
                             />
-                            <p className="text-red">{errors?.role?.message}</p>
+                            <p className="text-red">{errors?.productType?.message}</p>
+                        </Box>
+
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
+                                        <FormControl sx={{  minWidth: 120 }} className="mt-3 w-full" fullWidth>
+                                            <InputLabel required id="demo-simple-select-helper-label">
+                                                Tags
+                                            </InputLabel>{' '}
+                                            <Select
+                                                labelId="demo-simple-select-helper-label"
+                                                id="demo-simple-select-helper"
+                                                label="Tags"
+                                                {...field}
+                                                fullWidth
+                                                required
+                                                multiple
+                                                defaultValue={[]}
+                                                error={!!formState.errors?.productInfo?.tags}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                <MenuItem value={`super_admin`}>Quản trị viên</MenuItem>
+                                                <MenuItem value={'admin'}>Nhân viên</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    );
+                                }}
+                                name="productInfo?.tags"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.productInfo?.tags?.message}</p>
+                        </Box>
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
+                                        <TextField
+                                            {...field}
+                                            label="Tên sản phẩm"
+                                            error={!!formState.errors?.productInfo?.productName}
+                                            placeholder="Tên sản phẩm"
+                                            className="mt-3 w-full"
+                                            type="text"
+                                            variant="outlined"
+                                            required
+                                            inputProps={{ maxLength: 50 }}
+                                        />
+                                    );
+                                }}
+                                name="productInfo.productName"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.productInfo?.productName?.message}</p>
+                        </Box>
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
+                                        <TextField
+                                            {...field}
+                                            label="Mã sản phẩm"
+                                            error={!!formState.errors?.productInfo?.productCode}
+                                            placeholder="Mã sản phẩm"
+                                            className="mt-3 w-full"
+                                            type="text"
+                                            variant="outlined"
+                                            required
+                                            inputProps={{ maxLength: 50 }}
+                                        />
+                                    );
+                                }}
+                                name="productInfo.productCode"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.productInfo?.productCode?.message}</p>
+                        </Box>
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
+                                        <TextField
+                                            {...field}
+                                            label="Số lượng"
+                                            error={!!formState.errors?.productInfo?.quantity}
+                                            placeholder="Số lượng"
+                                            className="mt-3 w-full"
+                                            type="text"
+                                            required
+                                            inputProps={{ maxLength: 50 }}
+                                        />
+                                    );
+                                }}
+                                name="productInfo.quantity"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.productInfo?.quantity?.message}</p>
+                        </Box>
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
+                                        <FormControl sx={{  minWidth: 120 }} className="mt-3 w-full" fullWidth>
+                                            <InputLabel required id="demo-simple-select-helper-label">
+                                                Kích thước
+                                            </InputLabel>{' '}
+                                            <Select
+                                                labelId="demo-simple-select-helper-label"
+                                                id="demo-simple-select-helper"
+                                                label="Kích thước"
+                                                {...field}
+                                                fullWidth
+                                                required
+                                                multiple
+                                                defaultValue={[]}
+                                                error={!!formState.errors?.productInfo?.size}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                <MenuItem value={`super_admin`}>Quản trị viên</MenuItem>
+                                                <MenuItem value={'admin'}>Nhân viên</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    );
+                                }}
+                                name="productInfo.size"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.productInfo?.size?.message}</p>
+                        </Box>
+
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
+                                        <TextField
+                                            {...field}
+                                            label="Giá tiền"
+                                            error={!!formState.errors?.productInfo?.quantity}
+                                            placeholder="Giá tiền"
+                                            className="mt-3 w-full"
+                                            type="text"
+                                            required
+                                            inputProps={{ maxLength: 50 }}
+                                        />
+                                    );
+                                }}
+                                name="productInfo.quantity"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.productInfo?.quantity?.message}</p>
+                        </Box>
+                    </div>
+                </div>
+                <div className="container bg-white p-3 mt-5">
+                    <div className="flex items-center gap-x-3">
+                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Mô tả sản phẩm</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        <Box>
+                            <ReactQuill theme="snow" value={'value'} />
                         </Box>
                     </div>
                 </div>

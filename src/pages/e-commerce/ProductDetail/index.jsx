@@ -203,7 +203,7 @@ const ProductDetail = () => {
             <Grid item xs={12} lg={6}>
                 <Card variant="outlined">
                     <CardContent>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                        <Box sx={{  borderColor: 'divider' }}>
                             <Tabs
                                 variant="scrollable"
                                 scrollButtons="auto"
