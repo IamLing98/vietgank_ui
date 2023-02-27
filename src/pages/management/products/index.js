@@ -88,7 +88,8 @@ export default function BasicBreadcrumbs() {
         axios
             .get('/api/category/tree-view?category_code=SIZE')
             .then((response) => { 
-                setSizes({ ...response.data.data });
+                let children = response.data.data[0]?.children;
+                setSizes(children);
             })
             .catch((error) => {
                 console.error(`Errorr: `, error);
@@ -190,6 +191,7 @@ export default function BasicBreadcrumbs() {
                         onSubmit={onCreate}
                         options={options}
                         categories={categories} 
+                        sizes={sizes}
                     />
                 ) : (
                     ''

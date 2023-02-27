@@ -409,18 +409,15 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                         id="demo-multiple-checkbox"
                         multiple
                         value={searchValues?.parent_category_code}
-                        onChange={(e) => {
-                            console.log(`Handle select loai: `, e?.target?.value);
+                        onChange={(e) => { 
                             let newOptions = [];
                             for (let i = 0; i < e?.target?.value?.length; i++) {
                                 let key = e?.target?.value[i];
-                                let arr1 = options[key];
-                                console.log(`options[key]: `, arr1);
+                                let arr1 = options[key]; 
                                 arr1?.forEach((category) => {
                                     newOptions.push(category);
                                 });
-                            }
-                            console.log(`newOptions:  setTagOptions`, newOptions);
+                            } 
                             setTagOptions([...newOptions]);
                             setSearchValues({ ...searchValues, parent_category_code: e?.target?.value });
                         }}

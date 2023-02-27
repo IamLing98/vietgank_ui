@@ -47,7 +47,7 @@ const initDefaultValues = {
     serviceType: 'CLOTHES'
 };
 
-export default ({ onSubmit, pageStatus, setPageStatus, categories, options }) => {
+export default ({ onSubmit, pageStatus, setPageStatus, categories, options, sizes }) => {
     const [defaultValues, setDefaultValues] = useState({ ...initDefaultValues });
 
     const [tagsOptions, setTagOptions] = useState([]);
@@ -266,11 +266,13 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options }) =>
                                                 defaultValue={[]}
                                                 error={!!formState.errors?.productInfo?.size}
                                             >
-                                                <MenuItem value="">
-                                                    <em>None</em>
-                                                </MenuItem>
-                                                <MenuItem value={`super_admin`}>Quản trị viên</MenuItem>
-                                                <MenuItem value={'admin'}>Nhân viên</MenuItem>
+                                                 {sizes?.map((item, index) => {
+                                                    return (
+                                                        <MenuItem key={index + item?._id} value={item?.category_code}>
+                                                            {item?.category_name}
+                                                        </MenuItem>
+                                                    );
+                                                })}
                                             </Select>
                                         </FormControl>
                                     );
@@ -288,7 +290,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options }) =>
                                         <TextField
                                             {...field}
                                             label="Giá tiền"
-                                            error={!!formState.errors?.productInfo?.quantity}
+                                            error={!!formState.errors?.productInfo?.price}
                                             placeholder="Giá tiền"
                                             className="mt-3 w-full"
                                             type="text"
@@ -297,10 +299,10 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options }) =>
                                         />
                                     );
                                 }}
-                                name="productInfo.quantity"
+                                name="productInfo.price"
                                 control={control}
                             />
-                            <p className="text-red">{errors?.productInfo?.quantity?.message}</p>
+                            <p className="text-red">{errors?.productInfo?.price?.message}</p>
                         </Box>
                     </div>
                 </div>
@@ -318,8 +320,9 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options }) =>
                     <button
                         type="button "
                         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        onClick={handleSubmit(function (values) {
-                            onSubmit(dataUtils.camelToSnakeCase(values));
+                        onClick={handleSubmit(function (values) { 
+                            console.log(dataUtils.camelToSnakeCase(values))
+                            onSubmit(dataUtils.camelToSnakeCase(values)); 
                         })}
                     >
                         {pageStatus?.status === constants?.PAGE_STATUS.CREATE.status ? 'Tạo mới ' : 'Cập nhật '}
