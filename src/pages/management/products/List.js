@@ -27,6 +27,7 @@ import { visuallyHidden } from '@mui/utils';
 import moment from 'moment';
 
 import Loading from '../../../components/Loading';
+import { FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select } from '@mui/material';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -140,8 +141,13 @@ function EnhancedTableToolbar(props) {
     );
 }
 
-const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading }) => {
-    useEffect(() => {}, [JSON.stringify(columns)]);
+const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading, categories, options }) => {
+    useEffect(() => {
+        console.log(`Categories: `, categories);
+        console.log(`options: `, options);
+    }, [JSON.stringify(columns)]);
+
+    const [tagsOptions, setTagOptions] = useState([]);
 
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
@@ -202,7 +208,14 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             disablePadding: true,
             label: 'Thumbnail',
             render: (value, record, index) => {
-                return <img width="52" className='cursor-pointer' src="https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg" alt="thumbnail" />
+                return (
+                    <img
+                        width="52"
+                        className="cursor-pointer"
+                        src="https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg"
+                        alt="thumbnail"
+                    />
+                );
             }
         },
         {
@@ -235,7 +248,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             }
         },
         {
-            id: 'userInfo',
+            id: 'price',
             numeric: false,
             disablePadding: true,
             label: 'Giá',
@@ -251,9 +264,9 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             render: (value, record, index) => {
                 return <h3>{record?.userInfo?.phoneNumber}</h3>;
             }
-        }, 
+        },
         {
-            id: 'phoneNumber',
+            id: 'status',
             numeric: false,
             disablePadding: true,
             label: 'TRẠNG THÁI',
@@ -262,7 +275,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             }
         },
         {
-            id: 'phoneNumber',
+            id: 'action',
             numeric: false,
             disablePadding: true,
             label: 'Thao tác',
@@ -389,26 +402,79 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                 </div>
             </div>
             <div className="mt-6 md:flex md:items-center md:justify-between">
-                <div className="inline-flex overflow-hidden bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700">
-                    <button
-                        onClick={() => {
-                            setSearchValues({ ...searchValues, serviceType: 'super_admin' });
+                <FormControl sx={{ m: 1, width: 300 }}>
+                    <InputLabel id="demo-multiple-checkbox-label">Loại</InputLabel>
+                    <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        multiple
+                        value={searchValues?.parent_category_code}
+                        onChange={(e) => {
+                            console.log(`Handle select loai: `, e?.target?.value);
+                            let newOptions = [];
+                            for (let i = 0; i < e?.target?.value?.length; i++) {
+                                let key = e?.target?.value[i];
+                                let arr1 = options[key];
+                                console.log(`options[key]: `, arr1);
+                                arr1?.forEach((category) => {
+                                    newOptions.push(category);
+                                });
+                            }
+                            console.log(`newOptions:  setTagOptions`, newOptions);
+                            setTagOptions([...newOptions]);
+                            setSearchValues({ ...searchValues, parent_category_code: e?.target?.value });
                         }}
-                        className={
-                            searchValues?.serviceType === 'SHOPPING' ? constants.TAB_ACTIVE_CLASS.ACTIVE : constants.TAB_ACTIVE_CLASS.INACTIVE
-                        }
+                        input={<OutlinedInput label="Loại" />}
+                        renderValue={(selected) => selected.join(', ')}
                     >
-                        Mua sắm
-                    </button>
-                    <button
-                        onClick={() => {
-                            setSearchValues({ ...searchValues, role: 'admin' });
+                        {categories?.map((category) => (
+                            <MenuItem key={category?._id} value={category?.category_code}>
+                                <ListItemText primary={category?.category_name} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <FormControl sx={{ m: 1, width: 300 }}>
+                    <InputLabel id="demo-multiple-checkbox-label">Kiểu</InputLabel>
+                    <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        multiple
+                        value={searchValues?.tags}
+                        onChange={(e) => {
+                            setSearchValues({ ...searchValues, tags: e?.target?.value });
                         }}
-                        className={searchValues?.serviceType === 'BOOKING' ? constants.TAB_ACTIVE_CLASS.ACTIVE : constants.TAB_ACTIVE_CLASS.INACTIVE}
+                        input={<OutlinedInput label="Kiểu" />}
+                        renderValue={(selected) => selected.join(', ')}
                     >
-                        Đặt lịch
-                    </button>
-                </div>
+                        {tagsOptions?.map((category) => (
+                            <MenuItem key={category?._id} value={category?.category_code}>
+                                <ListItemText primary={category?.category_name} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <FormControl sx={{ m: 1, width: 300 }}>
+                    <InputLabel id="demo-multiple-checkbox-label">Giá</InputLabel>
+                    <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox" 
+                        value={searchValues?.priceSortDirection}
+                        onChange={(e) => {
+                            console.log(e.target.value);
+                        }}
+                        input={<OutlinedInput label="Tag" />} 
+                    >
+                        {[
+                            { value: '-1', label: 'Từ thấp đến cao' },
+                            { value: '1', label: 'Từ cao đến thấp' }
+                        ].map(({value, label}) => (
+                            <MenuItem key={value + label} value={value}>
+                                <ListItemText primary={label} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
                 <div className="relative flex items-center mt-4 md:mt-0">
                     <span className="absolute">
                         <svg

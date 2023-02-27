@@ -222,7 +222,7 @@ const ProductDetail = () => {
                                         }
                                     }}
                                     label="Reviews"
-                                    {...a11yProps(3)}
+                                    {...a11yProps(3)} 
                                     iconPosition="end"
                                     icon={
                                         <Badge

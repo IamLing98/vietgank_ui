@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import data from './data';
-import List from './list';
+import List from './List';
 import Breadcrumbs from '../../../components/Breadcrum';
 import constants from 'utils/constants';
 import CreateAndUpdate from './CreateAndUpdate';
@@ -23,15 +23,19 @@ export default function BasicBreadcrumbs() {
 
     const [pageStatus, setPageStatus] = useState({ ...constants.PAGE_STATUS.LIST });
 
-    const [categories, setCategories] = useState([])
+    const [categories, setCategories] = useState([]);
 
-    const [options, setOptions] = useState({})
+    const [options, setOptions] = useState({});
+
+    const [sizes, setSizes] = useState([])
 
     const [searchValues, setSearchValues] = useState({
         page: 0,
         size: 10,
         is_deleted: 'false',
-        serviceType: 'SHOPPING'
+        serviceType: 'SHOPPING',
+        parent_category_code: [],
+        tags: []
     });
 
     async function getDataSource(searchValues) {
@@ -59,29 +63,47 @@ export default function BasicBreadcrumbs() {
             });
     }
 
-
-
     const fetchCategories = async () => {
-        axios.get('/api/category/tree-view?category_code=LOAI_QUAN_AO').then((response) => {
-            let children = response.data.data[0]?.children 
-            setCategories(children)
-            let newOptions = {}
-            for(let i = 0 ; i < children?.length; i++){
-                let child = children[i];
-                newOptions[child[i]?.category_code] = child[i].children
-                 
-            }
-            setOptions({...newOptions})
-        }).catch(error => {
-            setCategories([])
-        });
+        axios
+            .get('/api/category/tree-view?category_code=LOAI_QUAN_AO')
+            .then((response) => {
+                let children = response.data.data[0]?.children;
+                console.log(`CHildrend: `, children);
+                setCategories(children);
+                let newOptions = {};
+                for (let i = 0; i < children?.length; i++) {
+                    let child = children[i];
+                    newOptions[child?.category_code] = child?.children;
+                }
+                console.log(`newOptions:`, newOptions);
+                setOptions({ ...newOptions });
+            })
+            .catch((error) => {
+                console.error(`Errorr: `, error);
+                setCategories([]);
+            });
     };
 
+    const fetchSize = async () => {
+        axios
+            .get('/api/category/tree-view?category_code=SIZE')
+            .then((response) => { 
+                setSizes({ ...response.data.data });
+            })
+            .catch((error) => {
+                console.error(`Errorr: `, error);
+                setSizes([]);
+            });
+    };
 
     useEffect(() => {
-        getDataSource(searchValues);
-        fetchCategories()
+        getDataSource(searchValues); 
     }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
+
+    useEffect(() => {
+        fetchCategories();
+        fetchSize()
+    }, [JSON.stringify(pageStatus)]);
 
     async function onCreate(values) {
         values.password = constants.AUTH.P_DEFAULT;
@@ -149,6 +171,7 @@ export default function BasicBreadcrumbs() {
                             setSearchValues={setSearchValues}
                             searchValues={searchValues}
                             categories={categories}
+                            options={options}
                         />
                         <DeleteConfirm
                             pageStatus={pageStatus}
@@ -161,7 +184,13 @@ export default function BasicBreadcrumbs() {
                     ''
                 )}
                 {pageStatus.status === constants.PAGE_STATUS.CREATE.status ? (
-                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} options={options}/>
+                    <CreateAndUpdate
+                        pageStatus={pageStatus}
+                        setPageStatus={setPageStatus}
+                        onSubmit={onCreate}
+                        options={options}
+                        categories={categories} 
+                    />
                 ) : (
                     ''
                 )}

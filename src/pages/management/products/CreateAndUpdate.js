@@ -37,18 +37,20 @@ import dataUtils from 'utils/dataUtils';
 
 const initDefaultValues = {
     productInfo: {
-        productCode: null, 
+        productCode: null,
         quantity: null,
         size: [],
         tags: [],
         productName: null
-    }, 
+    },
     productType: null,
     serviceType: 'CLOTHES'
 };
 
-export default ({ onSubmit, pageStatus, setPageStatus }) => {
+export default ({ onSubmit, pageStatus, setPageStatus, categories, options }) => {
     const [defaultValues, setDefaultValues] = useState({ ...initDefaultValues });
+
+    const [tagsOptions, setTagOptions] = useState([]);
 
     const schema = yup.object().shape({
         productInfo: yup.object().shape({
@@ -57,14 +59,15 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
             size: yup.array().required('Trường thông tin bắt buộc'),
             tags: yup.array().required('Trường thông tin bắt buộc'),
             productName: yup.string().nullable().required('Trường thông tin bắt buộc')
-        }), 
-        productType: yup.string().nullable().required('Trường thông tin bắt buộc'), 
+        }),
+        productType: yup.string().nullable().required('Trường thông tin bắt buộc')
     });
 
     const {
         handleSubmit,
         formState: { errors },
-        control
+        control,
+        setValue
     } = useForm({
         resolver: yupResolver(schema),
         mode: 'onChange',
@@ -101,7 +104,7 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
                             <Controller
                                 render={({ field, formState, fieldState }) => {
                                     return (
-                                        <FormControl sx={{  minWidth: 120 }} className="mt-3 w-full" fullWidth>
+                                        <FormControl sx={{ minWidth: 120 }} className="mt-3 w-full" fullWidth>
                                             <InputLabel required id="demo-simple-select-helper-label">
                                                 Loại sản phẩm
                                             </InputLabel>{' '}
@@ -113,13 +116,27 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
                                                 fullWidth
                                                 required
                                                 defaultValue={[]}
+                                                onChange={(e) => {
+                                                    let newOptions = [];
+                                                    let key = e?.target?.value;
+                                                    let arr1 = options[key];
+                                                    arr1?.forEach((category) => {
+                                                        newOptions.push(category);
+                                                    });
+                                                    console.log(`newOptions: `, newOptions);
+                                                    setTagOptions([...newOptions]);
+                                                    field.onChange(e);
+                                                    setValue('productInfo.tags', []);
+                                                }}
                                                 error={!!formState.errors?.productType}
                                             >
-                                                <MenuItem value="">
-                                                    <em>None</em>
-                                                </MenuItem>
-                                                <MenuItem value={`super_admin`}>Quản trị viên</MenuItem>
-                                                <MenuItem value={'admin'}>Nhân viên</MenuItem>
+                                                {categories?.map((item, index) => {
+                                                    return (
+                                                        <MenuItem key={index + item?._id} value={item?.category_code}>
+                                                            {item?.category_name}
+                                                        </MenuItem>
+                                                    );
+                                                })}
                                             </Select>
                                         </FormControl>
                                     );
@@ -134,7 +151,7 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
                             <Controller
                                 render={({ field, formState, fieldState }) => {
                                     return (
-                                        <FormControl sx={{  minWidth: 120 }} className="mt-3 w-full" fullWidth>
+                                        <FormControl sx={{ minWidth: 120 }} className="mt-3 w-full" fullWidth>
                                             <InputLabel required id="demo-simple-select-helper-label">
                                                 Tags
                                             </InputLabel>{' '}
@@ -149,16 +166,18 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
                                                 defaultValue={[]}
                                                 error={!!formState.errors?.productInfo?.tags}
                                             >
-                                                <MenuItem value="">
-                                                    <em>None</em>
-                                                </MenuItem>
-                                                <MenuItem value={`super_admin`}>Quản trị viên</MenuItem>
-                                                <MenuItem value={'admin'}>Nhân viên</MenuItem>
+                                                {tagsOptions?.map((item, index) => {
+                                                    return (
+                                                        <MenuItem key={index + item?._id} value={item?.category_code}>
+                                                            {item?.category_name}
+                                                        </MenuItem>
+                                                    );
+                                                })}
                                             </Select>
                                         </FormControl>
                                     );
                                 }}
-                                name="productInfo?.tags"
+                                name="productInfo.tags"
                                 control={control}
                             />
                             <p className="text-red">{errors?.productInfo?.tags?.message}</p>
@@ -232,7 +251,7 @@ export default ({ onSubmit, pageStatus, setPageStatus }) => {
                             <Controller
                                 render={({ field, formState, fieldState }) => {
                                     return (
-                                        <FormControl sx={{  minWidth: 120 }} className="mt-3 w-full" fullWidth>
+                                        <FormControl sx={{ minWidth: 120 }} className="mt-3 w-full" fullWidth>
                                             <InputLabel required id="demo-simple-select-helper-label">
                                                 Kích thước
                                             </InputLabel>{' '}
