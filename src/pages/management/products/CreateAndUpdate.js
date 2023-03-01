@@ -41,7 +41,8 @@ const initDefaultValues = {
         quantity: null,
         size: [],
         tags: [],
-        productName: null
+        productName: null,
+        description: null
     },
     productType: null,
     serviceType: 'CLOTHES'
@@ -236,7 +237,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                                             error={!!formState.errors?.productInfo?.quantity}
                                             placeholder="Số lượng"
                                             className="mt-3 w-full"
-                                            type="text"
+                                            type="number"
                                             required
                                             inputProps={{ maxLength: 50 }}
                                         />
@@ -293,7 +294,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                                             error={!!formState.errors?.productInfo?.price}
                                             placeholder="Giá tiền"
                                             className="mt-3 w-full"
-                                            type="text"
+                                            type="number"
                                             required
                                             inputProps={{ maxLength: 50 }}
                                         />
@@ -311,9 +312,18 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                         <h3 className="text-lg font-medium text-gray-800 dark:text-white">Mô tả sản phẩm</h3>
                     </div>
                     <div className="grid grid-cols-1 gap-4">
-                        <Box>
-                            <ReactQuill theme="snow" value={'value'} />
-                        </Box>
+                        <Controller
+                            render={({field}) => {
+                                return (
+                                    <Box>
+                                        <ReactQuill theme="snow"  {...field} placeholder="Mô tả sản phẩm" />
+                                    </Box>
+                                )
+                            }}
+                            name="productInfo.description"
+                            control={control
+                            }
+                            />
                     </div>
                 </div>
                 <div className="container flex justify-end p-3 mt-5">

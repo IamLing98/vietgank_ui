@@ -71,7 +71,7 @@ export default function BasicBreadcrumbs() {
                             label: newItem?.categoryName
                         };
                     });
-                    console.log(`parent`, parent);
+                    console.log(`parent`, parents);
                     setParentCategories(parents);
                 }
                 await setLoading(false);
@@ -187,7 +187,7 @@ export default function BasicBreadcrumbs() {
                     ''
                 )}
                 {pageStatus.status === constants.PAGE_STATUS.UPDATE.status ? (
-                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} />
+                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} parentCategories={parentCategories}/>
                 ) : (
                     ''
                 )}

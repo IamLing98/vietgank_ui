@@ -76,8 +76,10 @@ export default function BasicBreadcrumbs() {
     }
 
     async function onUpdate(values) {
+        let id = values._id
+        delete values._id
         await axios
-            .put('/')
+            .put(`/api/user/${id}`, values)
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Cập nhật thành công');

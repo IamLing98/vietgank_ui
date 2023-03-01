@@ -34,13 +34,9 @@ import DatePicker from '@mui/lab/DatePicker';
 import dataUtils from 'utils/dataUtils';
 
 const initDefaultValues = {
-    userInfo: {
-        fullName: null,
-        email: null,
-        phoneNumber: null
-    },
-    username: null,
-    role: null
+    parentCategoryId: null,
+    categoryName: null,
+    categoryCode: null
 };
 
 export default ({ onSubmit, pageStatus, setPageStatus, parentCategories }) => {
@@ -60,6 +56,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, parentCategories }) => {
         resolver: yupResolver(schema),
         mode: 'onChange',
         defaultValues: useMemo(() => {
+            console.log(pageStatus.record)
             return pageStatus.record;
         }, [JSON.stringify(pageStatus)])
     });
@@ -95,7 +92,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, parentCategories }) => {
                                         <Autocomplete
                                             disablePortal
                                             id="combo-box-demo"
-                                            options={[{ label: 'Danh mục cha', id: 'null' }].concat(parentCategories)}
+                                            options={[{ label: 'Danh mục cha', id: null }].concat(parentCategories)}
                                             className=" mt-3  w-full"
                                             getOptionLabel={(option) => option.label}
                                             {...field}
