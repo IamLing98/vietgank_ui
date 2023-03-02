@@ -142,9 +142,7 @@ function EnhancedTableToolbar(props) {
 }
 
 const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading, categories, options }) => {
-    useEffect(() => {
-        console.log(`Categories: `, categories);
-        console.log(`options: `, options);
+    useEffect(() => { 
     }, [JSON.stringify(columns)]);
 
     const [tagsOptions, setTagOptions] = useState([]);
@@ -201,46 +199,48 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows = searchValues?.page > 0 ? Math.max(0, (1 + searchValues?.page) * searchValues?.size - dataSource?.total) : 0;
 
-    const headCells = [
+    const headCells = [ 
         {
-            id: 'username',
+            id: 'date',
             numeric: false,
             disablePadding: true,
-            label: 'Thumbnail',
+            label: 'Ngày', 
             render: (value, record, index) => {
-                return (
-                    <img
-                        width="52"
-                        className="cursor-pointer"
-                        src="https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg"
-                        alt="thumbnail"
-                    />
-                );
+                return <h3>{value?.productName}</h3>;
             }
         },
         {
             id: 'productInfo',
             numeric: false,
             disablePadding: true,
-            label: 'Mã sản phẩm', 
+            label: 'Mã đơn hàng', 
             render: (value, record, index) => {
                 return <h3>{value?.productName}</h3>;
             }
         },
+        {
+            id: 'productInfo',
+            numeric: false,
+            disablePadding: true,
+            label: 'Tên khách hàng', 
+            render: (value, record, index) => {
+                return <h3>{value?.productName}</h3>;
+            }
+        }, 
         {
             id: 'productInfo',
             numeric: false,
             disablePadding: true,
             label: 'Tên sản phẩm', 
             render: (value, record, index) => {
-                return <h3>{value?.productName}</h3>;
+                return <h3>{Object.keys(value?.tags).map(key=>value?.tags[key])}</h3>;
             }
-        },
+        },  
         {
             id: 'productInfo',
             numeric: false,
             disablePadding: true,
-            label: 'Loại', 
+            label: 'Loại sản phẩm', 
             render: (value, record, index) => {
                 return <h3>{value?.productType}</h3>;
             }
@@ -253,16 +253,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             render: (value, record, index) => {
                 return <h3>{Object.keys(value?.tags).map(key=>value?.tags[key])}</h3>;
             }
-        }, 
-        {
-            id: 'productInfo',
-            numeric: false,
-            disablePadding: true,
-            label: 'Giá',
-            render: (value, record, index) => {
-                return <h3>{value?.price}</h3>;
-            }
-        },
+        },  
         {
             id: 'productInfo',
             numeric: false,
@@ -564,14 +555,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                                                             {cell?.render ? cell?.render(row[cell.id], row, index) : row[cell.id]}
                                                         </TableCell>
                                                     );
-                                                })}
-                                                {/* <TableCell component="th" id={labelId} scope="row" padding="none">
-                                                        {row.name}
-                                                    </TableCell>
-                                                    <TableCell align="right">{row.calories}</TableCell>
-                                                    <TableCell align="right">{row.fat}</TableCell>
-                                                    <TableCell align="right">{row.carbs}</TableCell>
-                                                    <TableCell align="right">{row.protein}</TableCell> */}
+                                                })} 
                                             </TableRow>
                                         );
                                     })}

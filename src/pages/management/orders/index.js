@@ -68,15 +68,13 @@ export default function BasicBreadcrumbs() {
         axios
             .get('/api/category/tree-view?category_code=LOAI_QUAN_AO')
             .then((response) => {
-                let children = response.data.data[0]?.children;
-                console.log(`CHildrend: `, children);
+                let children = response.data.data[0]?.children; 
                 setCategories(children);
                 let newOptions = {};
                 for (let i = 0; i < children?.length; i++) {
                     let child = children[i];
                     newOptions[child?.category_code] = child?.children;
-                }
-                console.log(`newOptions:`, newOptions);
+                } 
                 setOptions({ ...newOptions });
             })
             .catch((error) => {
@@ -143,8 +141,7 @@ export default function BasicBreadcrumbs() {
         await setPageStatus(constants.PAGE_STATUS.LIST);
     }
 
-    async function onDelete(values) {
-        console.log(`Values`, values);
+    async function onDelete(values) { 
         await axios
             .delete(`/api/product?product_id=${values?._id}`)
             .then((response) => {

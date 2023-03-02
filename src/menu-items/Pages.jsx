@@ -1,40 +1,13 @@
 // assets
 import {
-    LoginOutlined,
-    ProfileOutlined,
-    DatabaseOutlined,
-    DropboxOutlined,
-    UserOutlined,
-    IdcardOutlined,
-    InsertRowAboveOutlined,
-    BuildOutlined,
-    FileDoneOutlined,
     ShoppingCartOutlined,
-    MessageOutlined,
-    ClockCircleOutlined,
-    PercentageOutlined,
-    QuestionCircleOutlined,
-    QrcodeOutlined
-} from '@ant-design/icons';
+    DotChartOutlined,
+    OrderedListOutlined,
+    BookOutlined,
+    AlibabaOutlined,    
 
-// icons
-const icons = {
-    LoginOutlined,
-    ProfileOutlined,
-    UserOutlined,
-    InsertRowAboveOutlined,
-    BuildOutlined,
-    DatabaseOutlined,
-    IdcardOutlined,
-    DropboxOutlined,
-    FileDoneOutlined,
-    ShoppingCartOutlined,
-    MessageOutlined,
-    ClockCircleOutlined,
-    PercentageOutlined,
-    QuestionCircleOutlined,
-    QrcodeOutlined
-};
+} from '@ant-design/icons';
+ 
 
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
 
@@ -47,16 +20,40 @@ const pages = {
             id: 'e-commerce',
             type: 'item',
             title: 'Quản lý sản phẩm',
-            icon: icons.ShoppingCartOutlined,
+            icon: ShoppingCartOutlined,
             url: '/management/products',
             target: false, 
         },
         {
-            id: 'e-commerce2',
+            id: 'e-places',
             type: 'item',
             title: 'Quản lý địa điểm',
-            icon: icons.ShoppingCartOutlined,
+            icon: DotChartOutlined,
             url: '/management/places',
+            target: false, 
+        },
+        {
+            id: 'e-orders',
+            type: 'item',
+            title: 'Quản lý đơn hàng',
+            icon: OrderedListOutlined,
+            url: '/management/orders',
+            target: false, 
+        },
+        {
+            id: 'e-bookings',
+            type: 'item',
+            title: 'Quản lý đặt lịch',
+            icon: BookOutlined,
+            url: '/management/bookings',
+            target: false, 
+        },
+        {
+            id: 'e-campaigns',
+            type: 'item',
+            title: 'Quản lý khuyến mãi',
+            icon: AlibabaOutlined,
+            url: '/management/campaigns',
             target: false, 
         },
         // {
@@ -64,7 +61,7 @@ const pages = {
         //     title: '统计数据',
         //     type: 'item',
         //     url: '/statistics',
-        //     icon: icons.IdcardOutlined,
+        //     icon: IdcardOutlined,
         //     target: false
         // },
         // {
@@ -72,7 +69,7 @@ const pages = {
         //     title: '表单验证',
         //     type: 'item',
         //     url: '/form-validation',
-        //     icon: icons.FileDoneOutlined,
+        //     icon: FileDoneOutlined,
         //     target: false
         // },
         // {
@@ -80,7 +77,7 @@ const pages = {
         //     title: '倒计时',
         //     type: 'item',
         //     url: '/count-down',
-        //     icon: icons.ClockCircleOutlined,
+        //     icon: ClockCircleOutlined,
         //     target: false
         // },
         // {
@@ -88,14 +85,14 @@ const pages = {
         //     title: '二维码',
         //     type: 'item',
         //     url: '/qrcode',
-        //     icon: icons.QrcodeOutlined,
+        //     icon: QrcodeOutlined,
         //     target: false
         // },
         // {
         //     id: 'tours',
         //     type: 'collapse',
         //     title: '导航指南',
-        //     icon: icons.QuestionCircleOutlined,
+        //     icon: QuestionCircleOutlined,
         //     target: false,
         //     children: [
         //         {
@@ -118,7 +115,7 @@ const pages = {
         //     id: 'courses',
         //     type: 'collapse',
         //     title: '课程管理',
-        //     icon: icons.InsertRowAboveOutlined,
+        //     icon: InsertRowAboveOutlined,
         //     target: false,
         //     children: [
         //         {
@@ -142,7 +139,7 @@ const pages = {
         //     title: '数据呈现',
         //     type: 'item',
         //     url: '/data-view',
-        //     icon: icons.DatabaseOutlined,
+        //     icon: DatabaseOutlined,
         //     target: false
         // },
         // {
@@ -150,7 +147,7 @@ const pages = {
         //     title: '聊天',
         //     type: 'item',
         //     url: '/chat',
-        //     icon: icons.MessageOutlined,
+        //     icon: MessageOutlined,
         //     target: false
         // },
         // {
@@ -158,14 +155,14 @@ const pages = {
         //     title: '看板',
         //     type: 'item',
         //     url: '/kanban',
-        //     icon: icons.BuildOutlined,
+        //     icon: BuildOutlined,
         //     target: false
         // },
         // {
         //     id: 'e-commerce',
         //     type: 'item',
         //     title: 'Quản lý sản phẩm',
-        //     icon: icons.ShoppingCartOutlined,
+        //     icon: ShoppingCartOutlined,
         //     url: '/e-commerce/product-list',
         //     target: false, 
         // },
@@ -173,7 +170,7 @@ const pages = {
         // //     id: 'e-commerce',
         // //     type: 'collapse',
         // //     title: 'Quản lý sản phẩm',
-        // //     icon: icons.ShoppingCartOutlined,
+        // //     icon: ShoppingCartOutlined,
         // //     url: '/e-commerce',
         // //     target: false,
         // //     children: [
@@ -198,7 +195,7 @@ const pages = {
         //     type: 'collapse',
         //     title: '个人信息',
         //     url: '/profile',
-        //     icon: icons.UserOutlined,
+        //     icon: UserOutlined,
         //     target: false,
         //     children: [
         //         {
@@ -236,7 +233,7 @@ const pages = {
         //     id: 'react-tables',
         //     type: 'collapse',
         //     title: '表格',
-        //     icon: icons.InsertRowAboveOutlined,
+        //     icon: InsertRowAboveOutlined,
         //     target: false,
         //     children: [
         //         {
@@ -260,7 +257,7 @@ const pages = {
         //     id: 'dropzone',
         //     type: 'item',
         //     title: '拖拽区域',
-        //     icon: icons.DropboxOutlined,
+        //     icon: DropboxOutlined,
         //     url: '/dropzone',
         //     target: false
         // },
@@ -268,7 +265,7 @@ const pages = {
         //     id: 'plugins',
         //     type: 'collapse',
         //     title: '插件',
-        //     icon: icons.UserOutlined,
+        //     icon: UserOutlined,
         //     target: false,
         //     children: [
         //         {

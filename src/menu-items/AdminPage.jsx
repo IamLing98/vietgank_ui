@@ -1,40 +1,9 @@
 // assets
 import {
-    LoginOutlined,
-    ProfileOutlined,
-    DatabaseOutlined,
-    DropboxOutlined,
+    AlignLeftOutlined,
     UserOutlined,
-    IdcardOutlined,
-    InsertRowAboveOutlined,
-    BuildOutlined,
-    FileDoneOutlined,
-    ShoppingCartOutlined,
-    MessageOutlined,
-    ClockCircleOutlined,
-    PercentageOutlined,
-    QuestionCircleOutlined,
-    QrcodeOutlined
-} from '@ant-design/icons';
-
-// icons
-const icons = {
-    LoginOutlined,
-    ProfileOutlined,
-    UserOutlined,
-    InsertRowAboveOutlined,
-    BuildOutlined,
-    DatabaseOutlined,
-    IdcardOutlined,
-    DropboxOutlined,
-    FileDoneOutlined,
-    ShoppingCartOutlined,
-    MessageOutlined,
-    ClockCircleOutlined,
-    PercentageOutlined,
-    QuestionCircleOutlined,
-    QrcodeOutlined
-};
+    SettingOutlined, 
+} from '@ant-design/icons'; 
 
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
 
@@ -47,7 +16,7 @@ const pages = {
             id: 'admin-categories',
             type: 'item',
             title: 'Cấu hình danh mục',
-            icon: icons.ShoppingCartOutlined,
+            icon: AlignLeftOutlined,
             url: '/admin/categories',
             target: false, 
         },
@@ -55,7 +24,7 @@ const pages = {
             id: 'admin-users',
             type: 'item',
             title: 'Quản lý tài khoản',
-            icon: icons.ShoppingCartOutlined,
+            icon: UserOutlined,
             url: '/admin/users',
             target: false, 
         }, 
@@ -63,7 +32,7 @@ const pages = {
             id: 'admin-config',
             type: 'item',
             title: 'Cài đặt',
-            icon: icons.ShoppingCartOutlined,
+            icon: SettingOutlined,
             url: '/admin/settings',
             target: false, 
         },

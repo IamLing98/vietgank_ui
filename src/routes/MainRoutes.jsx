@@ -80,6 +80,7 @@ const Settings = Loadable(lazy(() => import('pages/admin/settings')));
 const Categories = Loadable(lazy(() => import('pages/admin/categories')));
 const ProductManagement = Loadable(lazy(() => import('pages/management/products')));
 const PlacesManagement = Loadable(lazy(() => import('pages/management/places')));
+const OrderManagement = Loadable(lazy(() => import('pages/management/orders')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -190,6 +191,10 @@ const MainRoutes = {
                 {
                     path: 'places',
                     element: <PlacesManagement />
+                },
+                {
+                    path: 'orders',
+                    element: <OrderManagement />
                 },
                  
             ]
