@@ -47,6 +47,8 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
 
     const [newImages, setNewImages] = useState([])
 
+    const [currentImages, setCurrentImages] = useState([...pageStatus.record?.productInfo?.images] || [])
+
     const [thumbnail, setThumbnail] = useState(null)
 
     const [updating, setUpdating] = useState(false)
@@ -115,6 +117,14 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
         ])
     }
 
+    const onRemoveImage = idx => {
+        console.log(idx)
+        setCurrentImages([
+            ...currentImages.slice(0, idx),
+            ...currentImages.slice(idx + 1, currentImages.length)
+        ])
+    }
+
     const onNewProductAmount = () => {
         append({quantity: null, size: null})
     }
@@ -132,6 +142,21 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
         }
     }, [updating])
 
+    useEffect(() => {
+        setCurrentImages([...pageStatus.record?.productInfo?.images])
+    }, [JSON.stringify(pageStatus.record?.productInfo?.images )])
+
+    useEffect(() => {
+        let defaultProductTypeCode = pageStatus.record.productTypeCode
+        let newOptions = [];
+        let key = defaultProductTypeCode;
+        let arr1 = options[key];
+        arr1?.forEach((category) => {
+            newOptions.push(category);
+        });
+        setTagOptions([...newOptions]);
+    }, [])
+
     // useEffect(() => {
     //     if (pageStatus?.status === constants.PAGE_STATUS.UPDATE.status) {
     //         setDefaultValues(pageStatus?.record);
@@ -145,7 +170,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                     <h2 className="text-lg font-medium text-gray-800 dark:text-white">
                         {pageStatus?.status === constants?.PAGE_STATUS.CREATE.status
                             ? `Tạo mới sản phẩm`
-                            : `Cập nhật sản phẩm (${pageStatus?.record?.username})`}
+                            : `Cập nhật sản phẩm (${pageStatus?.record?.productInfo?.productName})`}
                     </h2>
                 </div>
             </div>
@@ -179,7 +204,6 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                                                     arr1?.forEach((category) => {
                                                         newOptions.push(category);
                                                     });
-                                                    console.log(`newOptions: `, newOptions);
                                                     setTagOptions([...newOptions]);
                                                     field.onChange(e);
                                                     setValue('productInfo.tags', []);
@@ -449,14 +473,21 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                         </Button>
                     </div>
                     <div className="flex items-center gap-x-3 flex-wrap">
-                        {thumbnail && <div style={{
-                            position: 'relative',
-                            width: '200px',
-                            height: '200px',
-                            backgroundPosition: 'center',
-                            backgroundSize: 'cover',
-                            backgroundRepeat: 'no-repeat',
-                            backgroundImage: `url(${thumbnail.url})` 
+                        {thumbnail && <div 
+                            className="cursor-pointer bg-cover bg-no-repeat bg-center"
+                            style={{
+                                position: 'relative',
+                                width: '200px',
+                                height: '200px',
+                                backgroundImage: `url(${thumbnail.url})` 
+                        }}></div>}
+                        {!thumbnail && pageStatus.record?.productInfo?.thumbnail && <div 
+                            className="cursor-pointer bg-cover bg-no-repeat bg-center"
+                            style={{
+                                position: 'relative',
+                                width: '200px',
+                                height: '200px',
+                                backgroundImage: `url(${pageStatus.record?.productInfo?.thumbnail})` 
                         }}></div>}
                     </div>
                 </div>
@@ -484,15 +515,14 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                     </div>
                     <div className="flex items-center gap-x-3 flex-wrap">
                         {newImages.map((image, idx) => (
-                            <div key={idx} style={{
-                                position: 'relative',
-                                width: '200px',
-                                height: '200px',
-                                backgroundPosition: 'center',
-                                backgroundSize: 'cover',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundImage: `url(${image.url})` 
-                            }}>
+                            <div key={idx} 
+                                className="cursor-pointer bg-cover bg-no-repeat bg-center" 
+                                style={{
+                                    position: 'relative',
+                                    width: '200px',
+                                    height: '200px',
+                                    backgroundImage: `url(${image.url})` 
+                                }}>
                                 <Tooltip title="Xóa">
                                     <CloseCircleOutlined color='red' size='large' style={{
                                         position: 'absolute',
@@ -504,6 +534,30 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                                     }} onClick={e => {
                                         e.preventDefault()
                                         onRemoveNewImage(idx)}} 
+                                    />
+                                </Tooltip>
+                            </div>
+                        ))}
+                        {currentImages.map((image, idx) => (
+                            <div key={image} 
+                                className="cursor-pointer bg-cover bg-no-repeat bg-center" 
+                                style={{
+                                    position: 'relative',
+                                    width: '200px',
+                                    height: '200px',
+                                    backgroundImage: `url(${image})` 
+                                }}>
+                                <Tooltip title="Xóa">
+                                    <CloseCircleOutlined color='red' size='large' style={{
+                                        position: 'absolute',
+                                        top: '-10px',
+                                        right: '-10px',
+                                        fontSize: '25px',
+                                        cursor: 'pointer',
+                                        color: 'red'
+                                    }} onClick={e => {
+                                        e.preventDefault()
+                                        onRemoveImage(idx)}} 
                                     />
                                 </Tooltip>
                             </div>
@@ -535,6 +589,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         onClick={handleSubmit(function (values) {
                             setUpdating(true)
+                            values.productInfo.images = currentImages
                             onSubmit({
                                 newImages,
                                 thumbnail,

@@ -33,8 +33,7 @@ export default function BasicBreadcrumbs() {
         page: 0,
         size: 10,
         is_deleted: 'false',
-        serviceType: 'SHOPPING',
-        parent_category_code: [],
+        product_type_code: [],
         tags: []
     });
 
@@ -168,8 +167,51 @@ export default function BasicBreadcrumbs() {
     }
 
     async function onUpdate(values) {
+        let {newImages, thumbnail, product} = values
+        //handle new images
+        if (newImages && newImages.length) {
+            let formData = new FormData()
+            for (const image of newImages) {
+                formData.append('files', image)
+            }
+            const response = await axios.post('/api/file/upload-multi', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            if (!response.data?.success) {
+                if (callback) callback();
+                return
+            }
+            let imageList = response.data.data
+            console.log(imageList)
+            if (imageList && imageList.length) {
+                if (!product.product_info.images) {
+                    product.product_info.images = []
+                }
+                product.product_info.images.push(...imageList)
+            }
+            console.log(product.product_info.images)
+        }
+        //handle thumb nail
+        if (thumbnail) {
+            let formData = new FormData()
+            formData.append('file', thumbnail)
+            const response = await axios.post('/api/file/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            if (!response.data?.success) {
+                if (callback) callback();
+                return
+            }
+            product.product_info.thumbnail = response.data.secure_url || response.data.url
+        }
         await axios
-            .put('/')
+            .put(`/api/product/${product._id}`, {
+                ...product
+            })
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Cập nhật thành công');
@@ -187,7 +229,7 @@ export default function BasicBreadcrumbs() {
     async function onDelete(values) {
         console.log(`Values`, values);
         await axios
-            .delete(`/api/product?product_id=${values?._id}`)
+            .delete(`/api/product/${values?._id}`)
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Xóa thành công');
@@ -222,6 +264,8 @@ export default function BasicBreadcrumbs() {
                             pageStatus={pageStatus}
                             onSubmit={onDelete}
                             setPageStatus={setPageStatus}
+                            title={'Xóa sản phẩm'}
+                            content={'Xóa sản phẩm này khỏi hệ thống?'}
                             open={pageStatus.status === constants.PAGE_STATUS.DELETE.status}
                         />
                     </>
@@ -242,7 +286,15 @@ export default function BasicBreadcrumbs() {
                     ''
                 )}
                 {pageStatus.status === constants.PAGE_STATUS.UPDATE.status ? (
-                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} />
+                    <CreateAndUpdate 
+                        pageStatus={pageStatus} 
+                        setPageStatus={setPageStatus} 
+                        onSubmit={onUpdate} 
+                        categories={categories} 
+                        options={options} 
+                        loading={loading}
+                        sizes={sizes}
+                    />
                 ) : (
                     ''
                 )}

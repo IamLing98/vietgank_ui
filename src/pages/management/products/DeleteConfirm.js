@@ -2,7 +2,7 @@ import * as React from 'react';
 import Dialog from '@mui/material/Dialog'; 
 import constants from 'utils/constants';
 
-export default function AlertDialog({ open, pageStatus, setPageStatus, onSubmit }) {
+export default function AlertDialog({ open, pageStatus, setPageStatus, onSubmit, title, content }) {
     const handleClose = () => {
         setPageStatus({ ...constants.PAGE_STATUS.LIST });
     };
@@ -22,8 +22,8 @@ export default function AlertDialog({ open, pageStatus, setPageStatus, onSubmit 
                             <i className="bx bx-error text-3xl" />
                         </div>
                         <div className="mt-4 md:mt-0 md:ml-6 text-center md:text-left">
-                            <p className="font-bold">Xóa tài khoản</p>
-                            <p className="text-sm text-gray-700 mt-1">Xóa tài khoản này sẽ ngăn người dùng truy cập hệ thống?</p>
+                            <p className="font-bold">{title || 'Xóa tài khoản'}</p>
+                            <p className="text-sm text-gray-700 mt-1">{content || 'Xóa tài khoản này sẽ ngăn người dùng truy cập hệ thống?'}</p>
                         </div>
                     </div>
                     <div className="text-center md:text-right mt-4 md:flex md:justify-end">

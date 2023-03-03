@@ -203,48 +203,46 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
 
     const headCells = [
         {
-            id: 'username',
+            id: 'thumbnail',
             numeric: false,
             disablePadding: true,
             label: 'Thumbnail',
             render: (value, record, index) => {
                 return (
-                    <img
-                        width="52"
-                        className="cursor-pointer"
-                        src="https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg"
-                        alt="thumbnail"
-                    />
+                    <div
+                        className="cursor-pointer bg-cover bg-no-repeat bg-center"
+                        style={{
+                        width: '70px',
+                        height: '70px',
+                        backgroundImage: `url(${record?.productInfo?.thumbnail || "https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg"})` 
+                    }}>
+
+                    </div>
                 );
             }
         },
         {
-            id: 'role',
+            id: 'productName',
             numeric: false,
             disablePadding: true,
             label: 'Tên sản phẩm',
             render: (value, record, index) => {
-                if (value === 'super_admin') {
-                    return (
-                        <span className="inline-block whitespace-nowrap rounded-[0.27rem] bg-warning-100 px-[0.65em] pt-[0.35em] pb-[0.25em] text-center align-baseline text-[0.75em] font-bold leading-none text-warning-800">
-                            Quản trị viên
-                        </span>
-                    );
-                } else
-                    return (
-                        <span class="inline-block whitespace-nowrap rounded-[0.27rem] bg-info-100 px-[0.65em] pt-[0.35em] pb-[0.25em] text-center align-baseline text-[0.75em] font-bold leading-none text-info-800">
-                            Nhân viên
-                        </span>
-                    );
+                return (
+                    <p className="font-bold text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.productInfo?.productName}
+                    </p>
+                );
             }
         },
         {
-            id: 'userInfo',
+            id: 'tags',
             numeric: false,
             disablePadding: true,
             label: 'DANH MỤC',
             render: (value, record, index) => {
-                return <h3>{record?.userInfo?.fullName}</h3>;
+                return <h3>{record?.productInfo?.tags}</h3>;
             }
         },
         {
@@ -253,25 +251,16 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             disablePadding: true,
             label: 'Giá',
             render: (value, record, index) => {
-                return <h3>{record?.userInfo?.email}</h3>;
+                return <h3>{record?.productInfo?.price}</h3>;
             }
         },
         {
-            id: 'phoneNumber',
+            id: 'quantity',
             numeric: false,
             disablePadding: true,
             label: 'Số lượng',
             render: (value, record, index) => {
-                return <h3>{record?.userInfo?.phoneNumber}</h3>;
-            }
-        },
-        {
-            id: 'status',
-            numeric: false,
-            disablePadding: true,
-            label: 'TRẠNG THÁI',
-            render: (value, record, index) => {
-                return <h3>{value ? moment(value)?.format('DD/MM/YYYY HH:mm:ss') : ''}</h3>;
+                return <h3>{record?.productInfo?.quantity}</h3>;
             }
         },
         {
@@ -282,24 +271,6 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             render: (value, record, index) => {
                 return (
                     <div className="flex gap-3 ">
-                        <Tooltip title="Khôi phục mật khẩu" placement="top">
-                            <button className="flex items-center justify-center w-1/2 px-4 py-2 text-sm tracking-wide text-black transition-colors duration-200 bg-cyan-100 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-cyan-300 dark:hover:bg-cyan-300 dark:bg-cyan-300">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="w-4 h-4"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                                    />
-                                </svg>
-                            </button>
-                        </Tooltip>
                         <Tooltip title="Chỉnh sửa" placement="top">
                             <button
                                 className="flex items-center justify-center w-1/2 px-4 py-2 text-sm tracking-wide text-black transition-colors duration-200 bg-blue-100 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-blue-300 dark:hover:bg-blue-300 dark:bg-blue-300"
@@ -408,7 +379,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                         labelId="demo-multiple-checkbox-label"
                         id="demo-multiple-checkbox"
                         multiple
-                        value={searchValues?.parent_category_code}
+                        value={searchValues?.product_type_code}
                         onChange={(e) => { 
                             let newOptions = [];
                             for (let i = 0; i < e?.target?.value?.length; i++) {
@@ -419,7 +390,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                                 });
                             } 
                             setTagOptions([...newOptions]);
-                            setSearchValues({ ...searchValues, parent_category_code: e?.target?.value });
+                            setSearchValues({ ...searchValues, product_type_code: e?.target?.value });
                         }}
                         input={<OutlinedInput label="Loại" />}
                         renderValue={(selected) => selected.join(', ')}
@@ -439,6 +410,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                         multiple
                         value={searchValues?.tags}
                         onChange={(e) => {
+                            console.log(e.target.value)
                             setSearchValues({ ...searchValues, tags: e?.target?.value });
                         }}
                         input={<OutlinedInput label="Kiểu" />}

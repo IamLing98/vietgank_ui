@@ -54,11 +54,27 @@ console.log(
 );
 
 function removeNullOrUndefined(obj){
-    return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null && v!=='' ));
+    return Object.fromEntries(Object.entries(obj).filter(([_, v]) => {
+        if (Array.isArray(v)) {
+            return v.length
+        } 
+        return v != null || v != ''
+    } ));
+}
+
+function removeEmptyList(obj) {
+    return Object.fromEntries(Object.entries(obj).filter(([_, v]) => {
+        if (Array.isArray(v)) {
+            return v.length
+        } else {
+            return true
+        }
+    }));
 }
 
 export default {
     camelToSnakeCase: camelToSnakeCase,
     snakeToCamelCase: snakeToCamelCase,
-    removeNullOrUndefined:removeNullOrUndefined
+    removeNullOrUndefined:removeNullOrUndefined,
+    removeEmptyList
 };
