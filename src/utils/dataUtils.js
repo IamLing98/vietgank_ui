@@ -2,6 +2,10 @@ function camelToSnakeCase(object) {
     let newObject = {};
     Object.keys(object).forEach((key) => {
         let newKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+        if (Array.isArray(object[key])) {
+            newObject[newKey] = object[key]
+            return
+        }
         if (typeof object[key] === 'object' && object[key] !== null) {
             newObject[newKey] = camelToSnakeCase(object[key]);
         } else {
@@ -20,6 +24,10 @@ function snakeToCamelCase(object) {
             newObject[newKey] = object[key];
         } else {
             newKey = key?.replace(/(_\w)/g, (k) => k[1].toUpperCase());
+            if (Array.isArray(object[key])) {
+                newObject[newKey] = object[key]
+                return
+            }
             if (typeof object[key] === 'object' && object[key] !== null) {
                 newObject[newKey] = snakeToCamelCase(object[key]);
             } else {

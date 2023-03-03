@@ -106,10 +106,53 @@ export default function BasicBreadcrumbs() {
         fetchSize()
     }, [JSON.stringify(pageStatus)]);
 
-    async function onCreate(values) {
+    async function onCreate(values, callback = null) {
+        let {newImages, thumbnail, product} = values
+        //handle new images
+        if (newImages && newImages.length) {
+            let formData = new FormData()
+            for (const image of newImages) {
+                formData.append('files', image)
+            }
+            const response = await axios.post('/api/file/upload-multi', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            if (!response.data?.success) {
+                if (callback) callback();
+                return
+            }
+            let imageList = response.data.data
+            console.log(imageList)
+            if (imageList && imageList.length) {
+                if (!product.product_info.images) {
+                    product.product_info.images = []
+                }
+                product.product_info.images.push(...imageList)
+            }
+            console.log(product.product_info.images)
+        }
+        //handle thumb nail
+        if (thumbnail) {
+            let formData = new FormData()
+            formData.append('file', thumbnail)
+            const response = await axios.post('/api/file/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            if (!response.data?.success) {
+                if (callback) callback();
+                return
+            }
+            product.product_info.thumbnail = response.data.secure_url || response.data.url
+        }
         values.password = constants.AUTH.P_DEFAULT;
         await axios
-            .post('/api/product', values)
+            .post('/api/product', {
+                ...product
+            })
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Tạo mới thành công');
@@ -121,6 +164,7 @@ export default function BasicBreadcrumbs() {
             .catch((err) => {
                 toast.error('Tạo mới thất bại');
             });
+        if (callback) callback();
     }
 
     async function onUpdate(values) {
@@ -192,6 +236,7 @@ export default function BasicBreadcrumbs() {
                         options={options}
                         categories={categories} 
                         sizes={sizes}
+                        loading={loading}
                     />
                 ) : (
                     ''
