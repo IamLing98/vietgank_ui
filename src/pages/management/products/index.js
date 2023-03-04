@@ -101,8 +101,10 @@ export default function BasicBreadcrumbs() {
     }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
 
     useEffect(() => {
-        fetchCategories();
-        fetchSize()
+        (async () => {
+            fetchCategories();
+            fetchSize()
+        })()
     }, [JSON.stringify(pageStatus)]);
 
     async function onCreate(values, callback = null) {

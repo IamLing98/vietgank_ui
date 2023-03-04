@@ -47,7 +47,8 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
 
     const [newImages, setNewImages] = useState([])
 
-    const [currentImages, setCurrentImages] = useState([...pageStatus.record?.productInfo?.images] || [])
+
+    const [currentImages, setCurrentImages] = useState([])
 
     const [thumbnail, setThumbnail] = useState(null)
 
@@ -143,18 +144,23 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
     }, [updating])
 
     useEffect(() => {
-        setCurrentImages([...pageStatus.record?.productInfo?.images])
+        if (pageStatus.status == 'UPDATE') {
+            setCurrentImages([...pageStatus.record?.productInfo?.images])
+        }
     }, [JSON.stringify(pageStatus.record?.productInfo?.images )])
 
     useEffect(() => {
-        let defaultProductTypeCode = pageStatus.record.productTypeCode
-        let newOptions = [];
-        let key = defaultProductTypeCode;
-        let arr1 = options[key];
-        arr1?.forEach((category) => {
-            newOptions.push(category);
-        });
-        setTagOptions([...newOptions]);
+        if (pageStatus.status == 'UPDATE') {
+            let defaultProductTypeCode = pageStatus.record.productTypeCode
+            let newOptions = [];
+            let key = defaultProductTypeCode;
+            let arr1 = options[key];
+            arr1?.forEach((category) => {
+                newOptions.push(category);
+            });
+            setTagOptions([...newOptions]);
+            setCurrentImages([...pageStatus?.record?.productInfo?.images] || [])
+        }
     }, [])
 
     // useEffect(() => {

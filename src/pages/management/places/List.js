@@ -27,6 +27,7 @@ import { visuallyHidden } from '@mui/utils';
 import moment from 'moment';
 
 import Loading from '../../../components/Loading';
+import { FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select } from '@mui/material';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -140,7 +141,7 @@ function EnhancedTableToolbar(props) {
     );
 }
 
-const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading }) => {
+const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading, categories }) => {
     useEffect(() => {}, [JSON.stringify(columns)]);
 
     const [order, setOrder] = React.useState('asc');
@@ -197,7 +198,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
 
     const headCells = [
         {
-            id: 'username',
+            id: 'thumbnail',
             numeric: false,
             disablePadding: true,
             label: 'Thumbnail',
@@ -206,87 +207,28 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             }
         },
         {
-            id: 'role',
+            id: 'bookingName',
             numeric: false,
             disablePadding: true,
-            label: 'Tên sản phẩm',
+            label: 'Tên địa điểm',
             render: (value, record, index) => {
-                if (value === 'super_admin') {
-                    return (
-                        <span className="inline-block whitespace-nowrap rounded-[0.27rem] bg-warning-100 px-[0.65em] pt-[0.35em] pb-[0.25em] text-center align-baseline text-[0.75em] font-bold leading-none text-warning-800">
-                            Quản trị viên
-                        </span>
-                    );
-                } else
-                    return (
-                        <span class="inline-block whitespace-nowrap rounded-[0.27rem] bg-info-100 px-[0.65em] pt-[0.35em] pb-[0.25em] text-center align-baseline text-[0.75em] font-bold leading-none text-info-800">
-                            Nhân viên
-                        </span>
-                    );
+                return (
+                    <p className="font-bold text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.bookingInfo?.name}
+                    </p>
+                );
             }
         },
         {
-            id: 'userInfo',
-            numeric: false,
-            disablePadding: true,
-            label: 'DANH MỤC',
-            render: (value, record, index) => {
-                return <h3>{record?.userInfo?.fullName}</h3>;
-            }
-        },
-        {
-            id: 'userInfo',
-            numeric: false,
-            disablePadding: true,
-            label: 'Giá',
-            render: (value, record, index) => {
-                return <h3>{record?.userInfo?.email}</h3>;
-            }
-        },
-        {
-            id: 'phoneNumber',
-            numeric: false,
-            disablePadding: true,
-            label: 'Số lượng',
-            render: (value, record, index) => {
-                return <h3>{record?.userInfo?.phoneNumber}</h3>;
-            }
-        }, 
-        {
-            id: 'phoneNumber',
-            numeric: false,
-            disablePadding: true,
-            label: 'TRẠNG THÁI',
-            render: (value, record, index) => {
-                return <h3>{value ? moment(value)?.format('DD/MM/YYYY HH:mm:ss') : ''}</h3>;
-            }
-        },
-        {
-            id: 'phoneNumber',
+            id: 'setting',
             numeric: false,
             disablePadding: true,
             label: 'Thao tác',
             render: (value, record, index) => {
                 return (
                     <div className="flex gap-3 ">
-                        <Tooltip title="Khôi phục mật khẩu" placement="top">
-                            <button className="flex items-center justify-center w-1/2 px-4 py-2 text-sm tracking-wide text-black transition-colors duration-200 bg-cyan-100 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-cyan-300 dark:hover:bg-cyan-300 dark:bg-cyan-300">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="w-4 h-4"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                                    />
-                                </svg>
-                            </button>
-                        </Tooltip>
                         <Tooltip title="Chỉnh sửa" placement="top">
                             <button
                                 className="flex items-center justify-center w-1/2 px-4 py-2 text-sm tracking-wide text-black transition-colors duration-200 bg-blue-100 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-blue-300 dark:hover:bg-blue-300 dark:bg-blue-300"
@@ -389,50 +331,26 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                 </div>
             </div>
             <div className="mt-6 md:flex md:items-center md:justify-between">
-                <div className="inline-flex overflow-hidden bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700">
-                    <button
-                        onClick={() => {
-                            setSearchValues({ ...searchValues, serviceType: 'super_admin' });
+            <FormControl sx={{ m: 1, width: 300 }}>
+                    <InputLabel id="demo-multiple-checkbox-label">Loại</InputLabel>
+                    <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        multiple
+                        value={searchValues?.booking_type_code}
+                        onChange={(e) => {
+                            setSearchValues({ ...searchValues, booking_type_code: e?.target?.value });
                         }}
-                        className={
-                            searchValues?.serviceType === 'SHOPPING' ? constants.TAB_ACTIVE_CLASS.ACTIVE : constants.TAB_ACTIVE_CLASS.INACTIVE
-                        }
+                        input={<OutlinedInput label="Loại" />}
+                        renderValue={(selected) => selected.join(', ')}
                     >
-                        Mua sắm
-                    </button>
-                    <button
-                        onClick={() => {
-                            setSearchValues({ ...searchValues, role: 'admin' });
-                        }}
-                        className={searchValues?.serviceType === 'BOOKING' ? constants.TAB_ACTIVE_CLASS.ACTIVE : constants.TAB_ACTIVE_CLASS.INACTIVE}
-                    >
-                        Đặt lịch
-                    </button>
-                </div>
-                <div className="relative flex items-center mt-4 md:mt-0">
-                    <span className="absolute">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="w-5 h-5 mx-3 text-gray-400 dark:text-gray-600"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                            />
-                        </svg>
-                    </span>
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm"
-                        className="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                        onChange={(e) => setSearchValues({ ...searchValues, username: e?.target?.value })}
-                    />
-                </div>
+                        {categories?.map((category) => (
+                            <MenuItem key={category?._id} value={category?.category_code}>
+                                <ListItemText primary={category?.category_name} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
             </div>
             {/* <TableData /> */}
 

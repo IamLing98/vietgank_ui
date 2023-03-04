@@ -23,11 +23,13 @@ export default function BasicBreadcrumbs() {
 
     const [pageStatus, setPageStatus] = useState({ ...constants.PAGE_STATUS.LIST });
 
+    const [categories, setCategories] = useState([])
+
     const [searchValues, setSearchValues] = useState({
         page: 0,
         size: 10,
         is_deleted: 'false',
-        serviceType:'SHOPPING'
+        booking_type_code: []
     });
 
     async function getDataSource(searchValues) {
@@ -37,7 +39,7 @@ export default function BasicBreadcrumbs() {
         object.page = object.page + 1;
         const qs = '?' + new URLSearchParams(dataUtils?.removeNullOrUndefined(object)).toString();
         axios
-            .get(`/api/product${qs}`)
+            .get(`/api/booking${qs}`)
             .then(async (response) => {
                 let data = response.data;
                 if (data?.success) {
@@ -59,38 +61,40 @@ export default function BasicBreadcrumbs() {
         getDataSource(searchValues);
     }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
 
-    async function onCreate(values) {
-        values.password = constants.AUTH.P_DEFAULT;
-        await axios
-            .post('/api/product', values)
-            .then((response) => {
-                if (response?.data?.success) {
-                    toast.info('Tạo mới thành công');
-                    setPageStatus(constants.PAGE_STATUS.LIST);
-                } else {
-                    toast.error('Tạo mới thất bại');
-                }
-            })
-            .catch((err) => {
-                toast.error('Tạo mới thất bại');
-            });
+    async function onCreate(values, callback) {
+        // values.password = constants.AUTH.P_DEFAULT;
+        // await axios
+        //     .post('/api/product', values)
+        //     .then((response) => {
+        //         if (response?.data?.success) {
+        //             toast.info('Tạo mới thành công');
+        //             setPageStatus(constants.PAGE_STATUS.LIST);
+        //         } else {
+        //             toast.error('Tạo mới thất bại');
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         toast.error('Tạo mới thất bại');
+        //     });
+        if (callback) callback()
     }
 
-    async function onUpdate(values) {
-        await axios
-            .put('/')
-            .then((response) => {
-                if (response?.data?.success) {
-                    toast.info('Cập nhật thành công');
-                    setPageStatus(constants.PAGE_STATUS.LIST);
-                } else {
-                    toast.error('Cập nhật thất bại');
-                }
-            })
-            .catch((err) => {
-                toast.error('Cập nhật thất bại');
-            });
-        await setPageStatus(constants.PAGE_STATUS.LIST);
+    async function onUpdate(values, callback) {
+        // await axios
+        //     .put('/')
+        //     .then((response) => {
+        //         if (response?.data?.success) {
+        //             toast.info('Cập nhật thành công');
+        //             setPageStatus(constants.PAGE_STATUS.LIST);
+        //         } else {
+        //             toast.error('Cập nhật thất bại');
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         toast.error('Cập nhật thất bại');
+        //     });
+        // await setPageStatus(constants.PAGE_STATUS.LIST);
+        if (callback) callback()
     }
 
     async function onDelete(values) {
@@ -111,9 +115,27 @@ export default function BasicBreadcrumbs() {
         await setPageStatus(constants.PAGE_STATUS.LIST);
     }
 
+    const fetchCategories = async () => {
+        axios.get('/api/category?parent_category_code=LOAI_DIA_DIEM')
+            .then(response => {
+                if (response.data.success) {
+                    setCategories(response.data.data.map(item => ({
+                        category_code: item.category_code,
+                        category_name: item.category_name
+                    })))
+                }
+            })
+    }
+
+    useEffect(() => {
+        (async () => {
+            fetchCategories();
+        })()
+    }, [JSON.stringify(pageStatus)]);
+
     return (
         <>
-            <Breadcrumbs values={['Quản lý', 'Quản lý sản phẩm']} />
+            <Breadcrumbs values={['Quản lý', 'Quản lý địa điểm']} />
             <section className="  mx-auto">
                 {pageStatus.status === constants.PAGE_STATUS.LIST.status || pageStatus.status === constants.PAGE_STATUS.DELETE.status ? (
                     <>
@@ -124,6 +146,7 @@ export default function BasicBreadcrumbs() {
                             dataSource={dataSource}
                             setSearchValues={setSearchValues}
                             searchValues={searchValues}
+                            categories={categories}
                         />
                         <DeleteConfirm
                             pageStatus={pageStatus}
@@ -136,12 +159,12 @@ export default function BasicBreadcrumbs() {
                     ''
                 )}
                 {pageStatus.status === constants.PAGE_STATUS.CREATE.status ? (
-                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} />
+                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} categories={categories} onSubmit={onCreate} />
                 ) : (
                     ''
                 )}
                 {pageStatus.status === constants.PAGE_STATUS.UPDATE.status ? (
-                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} />
+                    <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} categories={categories} />
                 ) : (
                     ''
                 )}
