@@ -2,8 +2,8 @@ FROM node:16.19.0-alpine3.16 as build-stage
 WORKDIR /app
 COPY . ./
 ENV GENERATE_SOURCEMAP=false
-RUN npm install 
-RUN npm run build
+RUN yarn install 
+RUN yarn build
 
 # Stage 2 - the production environment
 FROM nginx:alpine
