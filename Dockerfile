@@ -3,7 +3,8 @@ WORKDIR /app
 COPY . ./
 ENV GENERATE_SOURCEMAP=false
 RUN yarn install 
-RUN yarn build
+RUN npm run build; exit 0
+RUN npm run build
 
 # Stage 2 - the production environment
 FROM nginx:alpine
