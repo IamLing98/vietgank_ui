@@ -3,8 +3,7 @@ WORKDIR /app
 COPY . ./
 ENV GENERATE_SOURCEMAP=false
 RUN yarn install 
-RUN npm run build; exit 0
-RUN npm run build
+RUN NODE_OPTIONS="--max-old-space-size=4096" yarn build
 
 # Stage 2 - the production environment
 FROM nginx:alpine
