@@ -35,13 +35,17 @@ import dataUtils from 'utils/dataUtils';
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { CloseCircleOutlined } from '@ant-design/icons'
+import { toast } from 'react-toastify'
 
 const initDefaultValues = {
     bookingInfo: {
         name: null,
         description: null,
         address: null,
-        images: []
+        images: [],
+        thumbnail: null,
+        numberOfTables: 0
     },
     bookingTypeCode: null
 };
@@ -61,6 +65,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
         bookingInfo: yup.object().shape({
             name: yup.string().nullable().required('Trường thông tin bắt buộc'),
             address: yup.string().nullable().required('Trường thông tin bắt buộc'),
+            numberOfTables: yup.number().required('Trường thông tin bắt buộc').min(1, 'Trường thông tin bắt buộc'),
         }),
         bookingTypeCode: yup.string().nullable().required('Trường thông tin bắt buộc')
     });
@@ -121,6 +126,18 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
             ...currentImages.slice(idx + 1, currentImages.length)
         ])
     }
+
+    useEffect(() => {
+        if (updating) {
+            toast.info('Đang cập nhật')
+        }
+    }, [updating])
+
+    useEffect(() => {
+        if (pageStatus.status == 'UPDATE') {
+            setCurrentImages([...pageStatus.record?.bookingInfo?.images])
+        }
+    }, [JSON.stringify(pageStatus.record?.bookingInfo?.images )])
 
     return (
         <>
@@ -205,7 +222,6 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
                                             className="mt-3 w-full"
                                             type="text"
                                             required
-                                            inputProps={{ maxLength: 50 }}
                                         />
                                     );
                                 }}
@@ -213,6 +229,26 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
                                 control={control}
                             />
                             <p className="text-red">{errors?.bookingInfo?.address?.message}</p>
+                        </Box>
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
+                                        <TextField
+                                            {...field}
+                                            label="Số bàn"
+                                            error={!!formState.errors?.bookingInfo?.numberOfTables}
+                                            placeholder="Số bàn"
+                                            className="mt-3 w-full"
+                                            type="number"
+                                            required
+                                        />
+                                    );
+                                }}
+                                name="bookingInfo.numberOfTables"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.bookingInfo?.numberOfTables?.message}</p>
                         </Box>
                     </div>
                 </div>
@@ -357,7 +393,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
                             onSubmit({
                                 newImages,
                                 thumbnail,
-                                product: dataUtils.camelToSnakeCase(values)
+                                booking: dataUtils.camelToSnakeCase(values)
                             }, () => setUpdating(false)); 
                         })}
                         disabled={updating}

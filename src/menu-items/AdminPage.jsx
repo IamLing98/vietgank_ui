@@ -14,7 +14,8 @@ import {
     ClockCircleOutlined,
     PercentageOutlined,
     QuestionCircleOutlined,
-    QrcodeOutlined
+    QrcodeOutlined,
+    SettingOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -33,7 +34,8 @@ const icons = {
     ClockCircleOutlined,
     PercentageOutlined,
     QuestionCircleOutlined,
-    QrcodeOutlined
+    QrcodeOutlined,
+    SettingOutlined
 };
 
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
@@ -55,7 +57,7 @@ const pages = {
             id: 'admin-users',
             type: 'item',
             title: 'Quản lý tài khoản',
-            icon: icons.ShoppingCartOutlined,
+            icon: icons.UserOutlined,
             url: '/admin/users',
             target: false, 
         }, 
@@ -63,7 +65,7 @@ const pages = {
             id: 'admin-config',
             type: 'item',
             title: 'Cài đặt',
-            icon: icons.ShoppingCartOutlined,
+            icon: icons.SettingOutlined,
             url: '/admin/settings',
             target: false, 
         },

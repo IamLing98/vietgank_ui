@@ -203,7 +203,17 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             disablePadding: true,
             label: 'Thumbnail',
             render: (value, record, index) => {
-                return <img width="52" className='cursor-pointer' src="https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg" alt="thumbnail" />
+                return (
+                    <div
+                        className="cursor-pointer bg-cover bg-no-repeat bg-center"
+                        style={{
+                        width: '70px',
+                        height: '70px',
+                        backgroundImage: `url(${record?.bookingInfo?.thumbnail || "https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg"})` 
+                    }}>
+
+                    </div>
+                );
             }
         },
         {

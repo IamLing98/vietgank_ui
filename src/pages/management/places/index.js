@@ -62,45 +62,131 @@ export default function BasicBreadcrumbs() {
     }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
 
     async function onCreate(values, callback) {
-        // values.password = constants.AUTH.P_DEFAULT;
-        // await axios
-        //     .post('/api/product', values)
-        //     .then((response) => {
-        //         if (response?.data?.success) {
-        //             toast.info('Tạo mới thành công');
-        //             setPageStatus(constants.PAGE_STATUS.LIST);
-        //         } else {
-        //             toast.error('Tạo mới thất bại');
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         toast.error('Tạo mới thất bại');
-        //     });
-        if (callback) callback()
+        let {newImages, thumbnail, booking} = values
+        //handle new images
+        if (newImages && newImages.length) {
+            let formData = new FormData()
+            for (const image of newImages) {
+                formData.append('files', image)
+            }
+            const response = await axios.post('/api/file/upload-multi', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            if (!response.data?.success) {
+                if (callback) callback();
+                return
+            }
+            let imageList = response.data.data
+            console.log(imageList)
+            if (imageList && imageList.length) {
+                if (!booking.booking_info.images) {
+                    booking.booking_info.images = []
+                }
+                booking.booking_info.images.push(...imageList)
+            }
+            console.log(booking.booking_info.images)
+        }
+        //handle thumb nail
+        if (thumbnail) {
+            let formData = new FormData()
+            formData.append('file', thumbnail)
+            const response = await axios.post('/api/file/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            if (!response.data?.success) {
+                if (callback) callback();
+                return
+            }
+            booking.booking_info.thumbnail = response.data.secure_url || response.data.url
+        }
+        values.password = constants.AUTH.P_DEFAULT;
+        await axios
+            .post('/api/booking', {
+                ...booking
+            })
+            .then((response) => {
+                if (response?.data?.success) {
+                    toast.info('Tạo mới thành công');
+                    setPageStatus(constants.PAGE_STATUS.LIST);
+                } else {
+                    toast.error('Tạo mới thất bại');
+                }
+            })
+            .catch((err) => {
+                toast.error('Tạo mới thất bại');
+            });
+        if (callback) callback();
     }
 
     async function onUpdate(values, callback) {
-        // await axios
-        //     .put('/')
-        //     .then((response) => {
-        //         if (response?.data?.success) {
-        //             toast.info('Cập nhật thành công');
-        //             setPageStatus(constants.PAGE_STATUS.LIST);
-        //         } else {
-        //             toast.error('Cập nhật thất bại');
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         toast.error('Cập nhật thất bại');
-        //     });
-        // await setPageStatus(constants.PAGE_STATUS.LIST);
-        if (callback) callback()
+        let {newImages, thumbnail, booking} = values
+        //handle new images
+        if (newImages && newImages.length) {
+            let formData = new FormData()
+            for (const image of newImages) {
+                formData.append('files', image)
+            }
+            const response = await axios.post('/api/file/upload-multi', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            if (!response.data?.success) {
+                if (callback) callback();
+                return
+            }
+            let imageList = response.data.data
+            console.log(imageList)
+            if (imageList && imageList.length) {
+                if (!booking.booking_info.images) {
+                    booking.booking_info.images = []
+                }
+                booking.booking_info.images.push(...imageList)
+            }
+            console.log(booking.booking_info.images)
+        }
+        //handle thumb nail
+        if (thumbnail) {
+            let formData = new FormData()
+            formData.append('file', thumbnail)
+            const response = await axios.post('/api/file/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            if (!response.data?.success) {
+                if (callback) callback();
+                return
+            }
+            booking.booking_info.thumbnail = response.data.secure_url || response.data.url
+        }
+        await axios
+            .put(`/api/booking/${booking._id}`, {
+                ...booking
+            })
+            .then((response) => {
+                if (response?.data?.success) {
+                    toast.info('Cập nhật thành công');
+                    setPageStatus(constants.PAGE_STATUS.LIST);
+                } else {
+                    toast.error('Cập nhật thất bại');
+                }
+            })
+            .catch((err) => {
+                toast.error('Cập nhật thất bại');
+            });
+        await setPageStatus(constants.PAGE_STATUS.LIST);
+        callback && callback()
     }
 
     async function onDelete(values) {
         console.log(`Values`, values);
         await axios
-            .delete(`/api/product?product_id=${values?._id}`)
+            .delete(`/api/booking?product_id=${values?._id}`)
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Xóa thành công');

@@ -168,7 +168,7 @@ export default function BasicBreadcrumbs() {
         if (callback) callback();
     }
 
-    async function onUpdate(values) {
+    async function onUpdate(values, callback = null) {
         let {newImages, thumbnail, product} = values
         //handle new images
         if (newImages && newImages.length) {
@@ -226,6 +226,7 @@ export default function BasicBreadcrumbs() {
                 toast.error('Cập nhật thất bại');
             });
         await setPageStatus(constants.PAGE_STATUS.LIST);
+        callback && callback()
     }
 
     async function onDelete(values) {
