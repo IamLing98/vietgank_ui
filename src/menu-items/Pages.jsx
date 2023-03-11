@@ -59,6 +59,14 @@ const pages = {
             url: '/management/places',
             target: false, 
         },
+        {
+            id: 'e-commerce3',
+            type: 'item',
+            title: 'Horse Club',
+            icon: icons.ShoppingCartOutlined,
+            url: '/management/horse-clubs',
+            target: false, 
+        },
         // {
         //     id: 'statistic',
         //     title: '统计数据',

@@ -19,6 +19,7 @@ import Base from 'pages/react-table/Base';
 import Filtering from 'pages/react-table/Filter';
 import Pagination from 'pages/react-table/Pagnation';
 import RowSelection from 'pages/react-table/RowSelection';
+import HorseClub from 'pages/management/horse-club';
 
 const Chat = Loadable(lazy(() => import('pages/chat')));
 
@@ -190,6 +191,10 @@ const MainRoutes = {
                 {
                     path: 'places',
                     element: <PlacesManagement />
+                },
+                {
+                    path: 'horse-clubs',
+                    element: <HorseClub />
                 },
                  
             ]

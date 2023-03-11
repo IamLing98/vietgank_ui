@@ -1,5 +1,46 @@
-.auto_input{ 
-    .MuiInputBase-root{
+.auto_input {
+    .MuiInputBase-root {
         padding: 5px !important;
     }
+}
+
+.container-max {
+    padding-left: 0px !important;
+}
+
+.autocomplete-custom {
+    .MuiAutocomplete-inputRoot {
+        height: 44px;
+
+    }
+
+    input {
+        height: 0.4375em;
+    }
+}
+
+.field-label {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.rdrCalendarWrapper {
+    z-index: 1000 !important;
+}
+
+.input-custom {
+    .MuiOutlinedInput-root {
+        height: 44px !important;
+
+    }
+}
+
+.search-button {
+    background-color: gray;
+    color: white;
+    margin-top: 20px;
+    height: 44px;
+    min-width: 120px;
+    font-weight: 500;
+    
 }
