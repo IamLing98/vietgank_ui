@@ -3,7 +3,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import constants from 'utils/constants';
 
-const Editor = ({onChange,}) => {
+const Editor = ({onChange, title, defaultData}) => {
 
     function uploadAdapter(loader) {
         return {
@@ -42,27 +42,34 @@ const Editor = ({onChange,}) => {
 
     return (
         <div className="App">
-            <h2>Using CKEditor 5 build in React</h2>
+            <h2 className='text-lg font-medium text-gray-800 dark:text-white'>{title}</h2>
             <CKEditor
                 editor={ClassicEditor}
                 config={{
                     extraPlugins: [uploadPlugin]
                 }}
 
-                data=""
+                data={defaultData || ""}
                 onReady={editor => {
                     // You can store the "editor" and use when it is needed.
-                    console.log('Editor is ready to use!', editor);
+                    // console.log('Editor is ready to use!', editor);
+                    editor.editing.view.change((writer) => {
+                        writer.setStyle(
+                            "height",
+                            "200px",
+                            editor.editing.view.document.getRoot()
+                        );
+                        });
                 }}
                 onChange={(event, editor) => {
                     const data = editor.getData();
                     onChange({ event, editor, data });
                 }}
                 onBlur={(event, editor) => {
-                    console.log('Blur.', editor);
+                    // console.log('Blur.', editor);
                 }}
                 onFocus={(event, editor) => {
-                    console.log('Focus.', editor);
+                    // console.log('Focus.', editor);
                 }}
             />
         </div>

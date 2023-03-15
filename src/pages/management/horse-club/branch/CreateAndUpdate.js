@@ -16,6 +16,7 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import { visuallyHidden } from '@mui/utils';
 import ServiceDialog from './ServiceDialog'
+import CKEditor from 'components/Editor'
 
 // import TextField from '@mui/material/TextField';
 
@@ -56,8 +57,6 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
     ...pageStatus.record?.services || []
   ])
 
-  console.log(pageStatus.record.services)
-
   const [currentImages, setCurrentImages] = useState([])
   const [updating, setUpdating] = useState(false)
   const [serviceDialogTitle, setServiceDialogTitle] = useState('Thêm mới dịch vụ')
@@ -95,6 +94,8 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
 
   const {
     handleSubmit,
+    setValue,
+    getValues,
     formState: { errors },
     control
   } = useForm({
@@ -347,22 +348,14 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
           </div>
         </div>
       <div className="container bg-white p-3 mt-5">
-        <div className="flex items-center gap-x-3">
-          <h3 className="text-lg font-medium text-gray-800 dark:text-white">Mô tả địa điểm</h3>
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          <Controller
-            render={({field}) => {
-              return (
-                <Box>
-                  <ReactQuill theme="snow"  {...field} placeholder="Mô tả địa điểm" />
-                </Box>
-              )
+        <CKEditor
+          title='Mô tả địa điểm'
+          onChange={(event, editor, data) => {
+            console.log(event.data)
+            setValue('bookingInfo.description', event.data)
           }}
-            name="bookingInfo.description"
-            control={control}
-            />
-        </div>
+          defaultData={getValues('bookingInfo.description')}
+        />
       </div>
       <div className="container bg-white p-3 mt-5">
         <div className="flex items-center gap-x-3">
@@ -412,7 +405,6 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
             </TableRow>
             <TableBody>
               {currentServices.map((row, index) => {
-                console.log(row)
                 return (
                   <TableRow
                     hover

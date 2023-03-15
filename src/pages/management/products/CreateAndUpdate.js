@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 // import TextField from '@mui/material/TextField';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import CKEditor from 'components/Editor'
 
 import {
     TextField,
@@ -70,7 +71,8 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
         formState: { errors },
         control,
         register,
-        setValue
+        setValue,
+        getValues
     } = useForm({
         resolver: yupResolver(schema),
         mode: 'onChange',
@@ -571,23 +573,14 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories, options, size
                     </div>
                 </div>
                 <div className="container bg-white p-3 mt-5">
-                    <div className="flex items-center gap-x-3">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Mô tả sản phẩm</h3>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4">
-                        <Controller
-                            render={({field}) => {
-                                return (
-                                    <Box>
-                                        <ReactQuill theme="snow"  {...field} placeholder="Mô tả sản phẩm" />
-                                    </Box>
-                                )
-                            }}
-                            name="productInfo.description"
-                            control={control
-                            }
-                            />
-                    </div>
+                    <CKEditor
+                    title='Mô tả sản phẩm'
+                    onChange={(event, editor, data) => {
+                        console.log(event.data)
+                        setValue('productInfo.description', event.data)
+                    }}
+                    defaultData={getValues('productInfo.description')}
+                    />
                 </div>
                 <div className="container flex justify-end p-3 mt-5">
                     <button

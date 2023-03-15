@@ -6,6 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { FormControl, InputLabel, Typography, Button, Tooltip } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
+import CKEditor from 'components/Editor'
 
 // import TextField from '@mui/material/TextField';
 
@@ -70,6 +71,8 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
 
     const {
         handleSubmit,
+        setValue,
+        getValues,
         formState: { errors },
         control
     } = useForm({
@@ -344,23 +347,20 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
                     </div>
                 </div>
                 <div className="container bg-white p-3 mt-5">
-                    <div className="flex items-center gap-x-3">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">Mô tả địa điểm</h3>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4">
-                        <Controller
-                            render={({field}) => {
-                                return (
-                                    <Box>
-                                        <ReactQuill theme="snow"  {...field} placeholder="Mô tả địa điểm" />
-                                    </Box>
-                                )
-                            }}
-                            name="bookingInfo.description"
-                            control={control}
-                            />
-                    </div>
+                    <CKEditor
+                    title='Mô tả chi nhánh'
+                    onChange={(event, editor, data) => {
+                        console.log(event.data)
+                        setValue('bookingInfo.description', event.data)
+                    }}
+                    defaultData={getValues('bookingInfo.description')}
+                    />
                 </div>
+                <CKEditor
+                    onChange={(event, editor, data) => {
+                        console.log(event, editor, data)
+                    }}
+                />
                 <div className="container flex justify-end p-3 mt-5">
                     <button
                         type="button "

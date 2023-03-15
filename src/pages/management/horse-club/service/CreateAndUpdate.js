@@ -37,6 +37,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { CloseCircleOutlined } from '@ant-design/icons'
 import { toast } from 'react-toastify'
+import CKEditor from 'components/Editor'
 
 const initDefaultValues = {
   serviceInfo: {
@@ -64,6 +65,8 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
 
   const {
     handleSubmit,
+    setValue,
+    getValues,
     formState: { errors },
     control
   } = useForm({
@@ -282,22 +285,14 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
                     </div>
                 </div>
       <div className="container bg-white p-3 mt-5">
-        <div className="flex items-center gap-x-3">
-          <h3 className="text-lg font-medium text-gray-800 dark:text-white">Mô tả dịch vụ</h3>
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          <Controller
-            render={({field}) => {
-              return (
-                <Box>
-                  <ReactQuill theme="snow"  {...field} placeholder="Mô tả dịch vụ" />
-                </Box>
-              )
+        <CKEditor
+          title='Mô tả dịch vụ'
+          onChange={(event, editor, data) => {
+            console.log(event.data)
+            setValue('serviceInfo.description', event.data)
           }}
-            name="serviceInfo.description"
-            control={control}
-            />
-        </div>
+          defaultData={getValues('serviceInfo.description')}
+        />
       </div>
       <div className="container flex justify-end p-3 mt-5">
         <button
