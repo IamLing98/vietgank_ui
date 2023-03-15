@@ -141,9 +141,8 @@ function EnhancedTableToolbar(props) {
     );
 }
 
-const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading, categories, options }) => {
-
-    const [tagsOptions, setTagOptions] = useState([]);
+const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading, categories }) => {
+    useEffect(() => {}, [JSON.stringify(columns)]);
 
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
@@ -210,7 +209,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                         style={{
                         width: '70px',
                         height: '70px',
-                        backgroundImage: `url(${record?.productInfo?.thumbnail || "https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg"})` 
+                        backgroundImage: `url(${record?.bookingInfo?.thumbnail || "https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg"})` 
                     }}>
 
                     </div>
@@ -218,49 +217,22 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             }
         },
         {
-            id: 'productName',
+            id: 'bookingName',
             numeric: false,
             disablePadding: true,
-            label: 'Tên sản phẩm',
+            label: 'Tên địa điểm',
             render: (value, record, index) => {
                 return (
                     <p className="font-bold text-ellipsis overflow-hidden whitespace-nowrap" style={{
                         maxWidth: '200px'
                     }}>
-                        {record?.productInfo?.productName}
+                        {record?.bookingInfo?.name}
                     </p>
                 );
             }
         },
         {
-            id: 'tags',
-            numeric: false,
-            disablePadding: true,
-            label: 'DANH MỤC',
-            render: (value, record, index) => {
-                return <h3>{record?.productInfo?.tags}</h3>;
-            }
-        },
-        {
-            id: 'price',
-            numeric: false,
-            disablePadding: true,
-            label: 'Giá',
-            render: (value, record, index) => {
-                return <h3>{record?.productInfo?.price}</h3>;
-            }
-        },
-        {
-            id: 'quantity',
-            numeric: false,
-            disablePadding: true,
-            label: 'Số lượng',
-            render: (value, record, index) => {
-                return <h3>{record?.productInfo?.quantity}</h3>;
-            }
-        },
-        {
-            id: 'action',
+            id: 'setting',
             numeric: false,
             disablePadding: true,
             label: 'Thao tác',
@@ -369,24 +341,15 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                 </div>
             </div>
             <div className="mt-6 md:flex md:items-center md:justify-between">
-                <FormControl sx={{ m: 1, width: 300 }}>
+            <FormControl sx={{ m: 1, width: 300 }}>
                     <InputLabel id="demo-multiple-checkbox-label">Loại</InputLabel>
                     <Select
                         labelId="demo-multiple-checkbox-label"
                         id="demo-multiple-checkbox"
                         multiple
-                        value={searchValues?.product_type_code}
-                        onChange={(e) => { 
-                            let newOptions = [];
-                            for (let i = 0; i < e?.target?.value?.length; i++) {
-                                let key = e?.target?.value[i];
-                                let arr1 = options[key]; 
-                                arr1?.forEach((category) => {
-                                    newOptions.push(category);
-                                });
-                            } 
-                            setTagOptions([...newOptions]);
-                            setSearchValues({ ...searchValues, product_type_code: e?.target?.value });
+                        value={searchValues?.booking_type_code}
+                        onChange={(e) => {
+                            setSearchValues({ ...searchValues, booking_type_code: e?.target?.value });
                         }}
                         input={<OutlinedInput label="Loại" />}
                         renderValue={(selected) => selected.join(', ')}
@@ -398,72 +361,6 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                         ))}
                     </Select>
                 </FormControl>
-                <FormControl sx={{ m: 1, width: 300 }}>
-                    <InputLabel id="demo-multiple-checkbox-label">Kiểu</InputLabel>
-                    <Select
-                        labelId="demo-multiple-checkbox-label"
-                        id="demo-multiple-checkbox"
-                        multiple
-                        value={searchValues?.tags}
-                        onChange={(e) => {
-                            console.log(e.target.value)
-                            setSearchValues({ ...searchValues, tags: e?.target?.value });
-                        }}
-                        input={<OutlinedInput label="Kiểu" />}
-                        renderValue={(selected) => selected.join(', ')}
-                    >
-                        {tagsOptions?.map((category) => (
-                            <MenuItem key={category?._id} value={category?.category_code}>
-                                <ListItemText primary={category?.category_name} />
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <FormControl sx={{ m: 1, width: 300 }}>
-                    <InputLabel id="demo-multiple-checkbox-label">Giá</InputLabel>
-                    <Select
-                        labelId="demo-multiple-checkbox-label"
-                        id="demo-multiple-checkbox" 
-                        value={searchValues?.priceSortDirection}
-                        onChange={(e) => {
-                            console.log(e.target.value);
-                        }}
-                        input={<OutlinedInput label="Tag" />} 
-                    >
-                        {[
-                            { value: '-1', label: 'Từ thấp đến cao' },
-                            { value: '1', label: 'Từ cao đến thấp' }
-                        ].map(({value, label}) => (
-                            <MenuItem key={value + label} value={value}>
-                                <ListItemText primary={label} />
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <div className="relative flex items-center mt-4 md:mt-0">
-                    <span className="absolute">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="w-5 h-5 mx-3 text-gray-400 dark:text-gray-600"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                            />
-                        </svg>
-                    </span>
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm"
-                        className="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                        onChange={(e) => setSearchValues({ ...searchValues, username: e?.target?.value })}
-                    />
-                </div>
             </div>
             {/* <TableData /> */}
 

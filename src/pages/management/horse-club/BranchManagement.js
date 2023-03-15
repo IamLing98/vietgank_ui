@@ -11,8 +11,8 @@ import {
 
 import Loading from '../../../components/Loading';
 import { FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Tooltip } from '@mui/material';
-import DeleteConfirm from './service/DeleteConfirm'
-import CreateAndUpdate from './service/CreateAndUpdate'
+import DeleteConfirm from './branch/DeleteConfirm'
+import CreateAndUpdate from './branch/CreateAndUpdate'
 import dataUtils from 'utils/dataUtils'
 
 export default function ({ }) {
@@ -33,18 +33,35 @@ export default function ({ }) {
         is_deleted: 'false'
     });
 
+    const [services, setServices] = useState([])
+
     const headCells = [
         {
-            id: 'serviceName',
+            id: 'bookingName',
             numeric: false,
             disablePadding: true,
-            label: 'Tên dịch vụ',
+            label: 'Chi nhánh',
             render: (value, record, index) => {
                 return (
                     <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
                         maxWidth: '200px'
                     }}>
-                        {record?.serviceInfo?.name}
+                        {record?.bookingInfo?.name}
+                    </p>
+                );
+            }
+        },
+        {
+            id: 'bookingAddress',
+            numeric: false,
+            disablePadding: true,
+            label: 'Địa điểm',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.bookingInfo?.address}
                     </p>
                 );
             }
@@ -109,18 +126,35 @@ export default function ({ }) {
         }
     ]
 
+    async function fetchServices() {
+        axios
+            .get('/api/horse-service')
+            .then((response) => { 
+                setServices(dataUtils.snakeToCamelCaseWithArray(response.data?.data || []))
+            })
+            .catch((error) => {
+                console.error(`Errorr: `, error);
+                setSizes([]);
+            });
+    }
+
     async function getDataSource(searchValues) {
         await setLoading(true);
         let object = { ...searchValues };
         object.page = object.page + 1;
         const qs = '?' + new URLSearchParams(dataUtils?.removeNullOrUndefined(object)).toString();
         axios
-            .get(`/api/horse-service${qs}`)
+            .get(`/api/booking${qs}&booking_type_code=HORSE_CLUB`)
             .then(async (response) => {
                 let data = response.data;
                 if (data?.success) {
                     setDataSource({
-                        data: data?.data?.map((item) => dataUtils?.snakeToCamelCase(item)),
+                        data: data?.data?.map((item) => {
+                            if (item.services && item.services.length) {
+                                item.services = dataUtils.snakeToCamelCaseWithArray(item.services)
+                            }
+                            return dataUtils?.snakeToCamelCase(item)
+                        }),
                         total: data?.meta?.total
                     });
                 }
@@ -134,11 +168,17 @@ export default function ({ }) {
     }
 
     useEffect(() => {
+        (async () => {
+            await fetchServices();
+        })()
+    }, [JSON.stringify(pageStatus)]);
+
+    useEffect(() => {
         getDataSource(searchValues);
     }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
 
     async function onCreate(values, callback) {
-        let {newImages, thumbnail, service} = values
+        let {newImages, thumbnail, booking} = values
         //handle new images
         if (newImages && newImages.length) {
             let formData = new FormData()
@@ -157,12 +197,12 @@ export default function ({ }) {
             let imageList = response.data.data
             console.log(imageList)
             if (imageList && imageList.length) {
-                if (!service.service_info.images) {
-                    service.service_info.images = []
+                if (!booking.booking_info.images) {
+                    booking.booking_info.images = []
                 }
-                service.service_info.images.push(...imageList)
+                booking.booking_info.images.push(...imageList)
             }
-            console.log(service.service_info.images)
+            console.log(booking.booking_info.images)
         }
         //handle thumb nail
         if (thumbnail) {
@@ -177,12 +217,12 @@ export default function ({ }) {
                 if (callback) callback();
                 return
             }
-            service.service_info.thumbnail = response.data.secure_url || response.data.url
+            booking.booking_info.thumbnail = response.data.secure_url || response.data.url
         }
         values.password = constants.AUTH.P_DEFAULT;
         await axios
-            .post('/api/horse-service', {
-                ...service
+            .post('/api/booking', {
+                ...booking
             })
             .then((response) => {
                 if (response?.data?.success) {
@@ -199,7 +239,7 @@ export default function ({ }) {
     }
 
     async function onUpdate(values, callback) {
-        let {newImages, thumbnail, service} = values
+        let {newImages, thumbnail, booking} = values
         //handle new images
         if (newImages && newImages.length) {
             let formData = new FormData()
@@ -218,12 +258,12 @@ export default function ({ }) {
             let imageList = response.data.data
             console.log(imageList)
             if (imageList && imageList.length) {
-                if (!service.service_info.images) {
-                    service.service_info.images = []
+                if (!booking.booking_info.images) {
+                    booking.booking_info.images = []
                 }
-                service.service_info.images.push(...imageList)
+                booking.booking_info.images.push(...imageList)
             }
-            console.log(service.service_info.images)
+            console.log(booking.booking_info.images)
         }
         //handle thumb nail
         if (thumbnail) {
@@ -238,11 +278,11 @@ export default function ({ }) {
                 if (callback) callback();
                 return
             }
-            service.service_info.thumbnail = response.data.secure_url || response.data.url
+            booking.booking_info.thumbnail = response.data.secure_url || response.data.url
         }
         await axios
-            .put(`/api/horse-service/${service._id}`, {
-                ...service
+            .put(`/api/booking/${booking._id}`, {
+                ...booking
             })
             .then((response) => {
                 if (response?.data?.success) {
@@ -259,9 +299,9 @@ export default function ({ }) {
         callback && callback()
     }
 
-    async function onDelete(service) {
+    async function onDelete(booking) {
         await axios
-            .delete(`/api/horse-service/${service._id}`)
+            .delete(`/api/booking/${booking._id}`)
             .then((response) => {
                 if (response?.data?.success) {
                     toast.info('Xóa thành công');
@@ -288,7 +328,7 @@ export default function ({ }) {
                             setSearchValues={setSearchValues}
                             searchValues={searchValues}
                             headCells={headCells}
-                            title="Danh sách dịch vụ"
+                            title="Danh sách chi nhánh"
                         />
                         <DeleteConfirm
                             pageStatus={pageStatus}
@@ -301,12 +341,12 @@ export default function ({ }) {
                 ''
             )}
             {pageStatus.status === constants.PAGE_STATUS.CREATE.status ? (
-                <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} />
+                <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} services={services} />
             ) : (
                 ''
             )}
             {pageStatus.status === constants.PAGE_STATUS.UPDATE.status ? (
-                <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} />
+                <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} services={services} />
             ) : (
                 ''
             )}

@@ -67,6 +67,22 @@ const pages = {
             url: '/management/horse-clubs',
             target: false, 
         },
+        {
+            id: 'e-commerce-3',
+            type: 'item',
+            title: 'Quản lý order',
+            icon: icons.ShoppingCartOutlined,
+            url: '/management/orders',
+            target: false
+        },
+        {
+            id: 'e-commerce-4',
+            type: 'item',
+            title: 'Quản lý booking',
+            icon: icons.ShoppingCartOutlined,
+            url: '/management/bookings',
+            target: false
+        }
         // {
         //     id: 'statistic',
         //     title: '统计数据',

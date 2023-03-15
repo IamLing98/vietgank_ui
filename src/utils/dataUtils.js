@@ -38,20 +38,21 @@ function snakeToCamelCase(object) {
     return newObject;
 }
 
-console.log(
-    snakeToCamelCase({
-        _id: '63f5b910efba559db4c36501',
-        username: 'linhdv71111',
-        user_info: {
-            full_name: 'sadsad',
-            staff_position: '123213',
-            email: 'vandoan1029i@gmail.com',
-            phone_number: '0964708429'
-        },
-        created: '2023-02-22T04:48:53.341Z',
-        role: 'admin'
-    })
-);
+function snakeToCamelCaseWithArray(arr) {
+    let result = []
+    for (const item of arr) {
+        result.push(snakeToCamelCase(item))
+    }
+    return result
+}
+
+function camelToSnakeCaseWithArray(arr) {
+    let result = []
+    for (const item of arr) {
+        result.push(camelToSnakeCase(item))
+    }
+    return result
+}
 
 function removeNullOrUndefined(obj){
     return Object.fromEntries(Object.entries(obj).filter(([_, v]) => {
@@ -76,5 +77,7 @@ export default {
     camelToSnakeCase: camelToSnakeCase,
     snakeToCamelCase: snakeToCamelCase,
     removeNullOrUndefined:removeNullOrUndefined,
-    removeEmptyList
+    removeEmptyList,
+    snakeToCamelCaseWithArray,
+    camelToSnakeCaseWithArray
 };

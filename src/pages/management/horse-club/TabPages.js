@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 
 import BookingManagement from './BookingManagement';
 import ServiceManagement from './ServiceManagement';
-import TenantManagement from './TenantManagement';
+import BranchManagement from './BranchManagement';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -78,7 +78,7 @@ export default function FullWidthTabs() {
                     <BookingManagement />
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    <TenantManagement />
+                    <BranchManagement />
                 </TabPanel>
                 <TabPanel value={value} index={2} dir={theme.direction}>
                     <ServiceManagement />

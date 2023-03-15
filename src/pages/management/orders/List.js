@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import constants from 'utils/constants';
+import dateTimeUtils from 'utils/dateTimeUtils';
 
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
@@ -120,7 +121,7 @@ function EnhancedTableToolbar(props) {
                 </Typography>
             ) : (
                 <Typography sx={{ flex: '1 1 100%' }} variant="h6" id="tableTitle" component="div">
-                    Danh sách sản phẩm
+                    Danh sách đơn hàng
                 </Typography>
             )}
 
@@ -141,14 +142,14 @@ function EnhancedTableToolbar(props) {
     );
 }
 
-const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValues, loading, categories, options }) => {
-
-    const [tagsOptions, setTagOptions] = useState([]);
+const List = ({ dataSource, setPageStatus, searchValues, setSearchValues, loading, categories, options, orderStatuses }) => {
 
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
     const [dense, setDense] = React.useState(true);
+
+    const [tagsOptions, setTagOptions] = useState([]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -199,68 +200,97 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
 
     const headCells = [
         {
-            id: 'thumbnail',
-            numeric: false,
-            disablePadding: true,
-            label: 'Thumbnail',
-            render: (value, record, index) => {
-                return (
-                    <div
-                        className="cursor-pointer bg-cover bg-no-repeat bg-center"
-                        style={{
-                        width: '70px',
-                        height: '70px',
-                        backgroundImage: `url(${record?.productInfo?.thumbnail || "https://react-material.fusetheme.com/assets/images/apps/ecommerce/fall-glow.jpg"})` 
-                    }}>
-
-                    </div>
-                );
-            }
-        },
-        {
             id: 'productName',
             numeric: false,
             disablePadding: true,
-            label: 'Tên sản phẩm',
+            label: 'Sản phẩm',
             render: (value, record, index) => {
                 return (
-                    <p className="font-bold text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
                         maxWidth: '200px'
                     }}>
-                        {record?.productInfo?.productName}
+                        {record?.product.productInfo?.productName}
                     </p>
                 );
             }
         },
         {
-            id: 'tags',
+            id: 'userName',
             numeric: false,
             disablePadding: true,
-            label: 'DANH MỤC',
+            label: 'Người đặt',
             render: (value, record, index) => {
-                return <h3>{record?.productInfo?.tags}</h3>;
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.userInfo?.fullName || record?.userInfo?.username}
+                    </p>
+                );
             }
         },
         {
-            id: 'price',
+            id: 'status',
             numeric: false,
             disablePadding: true,
-            label: 'Giá',
+            label: 'Trạng thái', 
             render: (value, record, index) => {
-                return <h3>{record?.productInfo?.price}</h3>;
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {orderStatuses[record?.status]}
+                    </p>
+                );
             }
         },
         {
             id: 'quantity',
-            numeric: false,
+            numberic: true,
             disablePadding: true,
-            label: 'Số lượng',
+            label: 'Số lượng',
             render: (value, record, index) => {
-                return <h3>{record?.productInfo?.quantity}</h3>;
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.orderInfo?.quantity}
+                    </p>
+                );
             }
         },
         {
-            id: 'action',
+            id: 'price',
+            numberic: true,
+            disablePadding: true,
+            label: 'Thành tiền',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.orderInfo?.price}
+                    </p>
+                );
+            }
+        },
+        {
+            id: 'created',
+            numberic: true,
+            disablePadding: true,
+            label: 'Thời gian đặt',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {dateTimeUtils.beautifyDatetime(record?.created)}
+                    </p>
+                );
+            }
+        },
+        {
+            id: 'setting',
             numeric: false,
             disablePadding: true,
             label: 'Thao tác',
@@ -324,7 +354,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div className="py-3">
                     <div className="flex items-center gap-x-3">
-                        <h2 className="text-lg font-medium text-gray-800 dark:text-white">Danh sách sản phẩm</h2>
+                        <h2 className="text-lg font-medium text-gray-800 dark:text-white">Danh sách đơn hàng</h2>
                         <span className="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400">
                             Tổng số bản ghi: {dataSource?.total}
                         </span>
@@ -368,14 +398,14 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                     </button>
                 </div>
             </div>
-            <div className="mt-6 md:flex md:items-center md:justify-between">
+            <div className="mt-6 md:flex md:items-center">
                 <FormControl sx={{ m: 1, width: 300 }}>
                     <InputLabel id="demo-multiple-checkbox-label">Loại</InputLabel>
                     <Select
                         labelId="demo-multiple-checkbox-label"
                         id="demo-multiple-checkbox"
                         multiple
-                        value={searchValues?.product_type_code}
+                        value={searchValues['product.product_type_code']}
                         onChange={(e) => { 
                             let newOptions = [];
                             for (let i = 0; i < e?.target?.value?.length; i++) {
@@ -386,7 +416,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                                 });
                             } 
                             setTagOptions([...newOptions]);
-                            setSearchValues({ ...searchValues, product_type_code: e?.target?.value });
+                            setSearchValues({ ...searchValues, 'product.product_type_code': e?.target?.value });
                         }}
                         input={<OutlinedInput label="Loại" />}
                         renderValue={(selected) => selected.join(', ')}
@@ -404,10 +434,9 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                         labelId="demo-multiple-checkbox-label"
                         id="demo-multiple-checkbox"
                         multiple
-                        value={searchValues?.tags}
+                        value={searchValues['product.product_info.tags']}
                         onChange={(e) => {
-                            console.log(e.target.value)
-                            setSearchValues({ ...searchValues, tags: e?.target?.value });
+                            setSearchValues({ ...searchValues, 'product.product_info.tags': e?.target?.value });
                         }}
                         input={<OutlinedInput label="Kiểu" />}
                         renderValue={(selected) => selected.join(', ')}
@@ -419,51 +448,6 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
                         ))}
                     </Select>
                 </FormControl>
-                <FormControl sx={{ m: 1, width: 300 }}>
-                    <InputLabel id="demo-multiple-checkbox-label">Giá</InputLabel>
-                    <Select
-                        labelId="demo-multiple-checkbox-label"
-                        id="demo-multiple-checkbox" 
-                        value={searchValues?.priceSortDirection}
-                        onChange={(e) => {
-                            console.log(e.target.value);
-                        }}
-                        input={<OutlinedInput label="Tag" />} 
-                    >
-                        {[
-                            { value: '-1', label: 'Từ thấp đến cao' },
-                            { value: '1', label: 'Từ cao đến thấp' }
-                        ].map(({value, label}) => (
-                            <MenuItem key={value + label} value={value}>
-                                <ListItemText primary={label} />
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <div className="relative flex items-center mt-4 md:mt-0">
-                    <span className="absolute">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="w-5 h-5 mx-3 text-gray-400 dark:text-gray-600"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                            />
-                        </svg>
-                    </span>
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm"
-                        className="block w-full py-1.5 pr-5 text-gray-700 bg-white border border-gray-200 rounded-lg md:w-80 placeholder-gray-400/70 pl-11 rtl:pr-11 rtl:pl-5 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                        onChange={(e) => setSearchValues({ ...searchValues, username: e?.target?.value })}
-                    />
-                </div>
             </div>
             {/* <TableData /> */}
 
@@ -521,7 +505,7 @@ const List = ({ columns, dataSource, setPageStatus, searchValues, setSearchValue
 
                                                 {headCells?.map((cell, cellIndex) => {
                                                     return (
-                                                        <TableCell align="left">
+                                                        <TableCell align="left" key={cellIndex}>
                                                             {cell?.render ? cell?.render(row[cell.id], row, index) : row[cell.id]}
                                                         </TableCell>
                                                     );
