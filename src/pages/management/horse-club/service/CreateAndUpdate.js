@@ -121,7 +121,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
 
   useEffect(() => {
     if (pageStatus.status == 'UPDATE') {
-        setCurrentImages([...pageStatus.record?.serviceInfo?.images])
+        setCurrentImages([...pageStatus.record?.serviceInfo?.images || []])
     }
 }, [JSON.stringify(pageStatus?.record?.serviceInfo?.images || [] )])
 
