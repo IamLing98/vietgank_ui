@@ -64,7 +64,8 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
     const schema = yup.object().shape({
         bookingInfo: yup.object().shape({
             name: yup.string().nullable().required('Trường thông tin bắt buộc'),
-            address: yup.string().nullable().required('Trường thông tin bắt buộc')
+            address: yup.string().nullable().required('Trường thông tin bắt buộc'),
+            numberOfTables: yup.number().required('Trường thông tin bắt buộc').min(1, 'Trường thông tin bắt buộc'),
         }),
         bookingTypeCode: yup.string().nullable().required('Trường thông tin bắt buộc')
     });
@@ -231,6 +232,27 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
                             />
                             <p className="text-red">{errors?.bookingInfo?.address?.message}</p>
                         </Box>
+                        <Box>
+                            <Controller
+                                render={({ field, formState, fieldState }) => {
+                                    return (
+                                        <TextField
+                                            {...field}
+                                            label="Số bàn"
+                                            error={!!formState.errors?.bookingInfo?.numberOfTables}
+                                            placeholder="Số bàn"
+                                            className="mt-3 w-full"
+                                            type="number"
+                                            required
+                                            inputProps={{ maxLength: 50 }}
+                                        />
+                                    );
+                                }}
+                                name="bookingInfo.numberOfTables"
+                                control={control}
+                            />
+                            <p className="text-red">{errors?.bookingInfo?.numberOfTables?.message}</p>
+                        </Box>
                     </div>
                 </div>
                 <div className="container bg-white p-3 mt-5">
@@ -350,7 +372,6 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
                     <CKEditor
                     title='Mô tả chi nhánh'
                     onChange={(event, editor, data) => {
-                        console.log(event.data)
                         setValue('bookingInfo.description', event.data)
                     }}
                     defaultData={getValues('bookingInfo.description')}

@@ -4,8 +4,7 @@ import axios from "axios";
 // import { toast } from "react-toastify";
 import constants from "./constants";
 import {store} from "../store/index";
-import { logout } from "store/reducers/authSlice"; 
-import { useNavigate } from 'react-router';
+import { logout } from "store/reducers/authSlice";
 
 
 

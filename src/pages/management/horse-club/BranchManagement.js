@@ -129,7 +129,7 @@ export default function ({ }) {
     async function fetchServices() {
         axios
             .get('/api/horse-service')
-            .then((response) => { 
+            .then((response) => {
                 setServices(dataUtils.snakeToCamelCaseWithArray(response.data?.data || []))
             })
             .catch((error) => {

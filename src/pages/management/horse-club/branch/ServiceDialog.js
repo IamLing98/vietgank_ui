@@ -6,15 +6,6 @@ import {
   TextField
 } from '@mui/material'
 
-const initDefaultValues = {
-  serviceInfo: {
-    name: '',
-    description: ''
-  },
-  serviceType: null,
-  priceDetail: null
-}
-
 export default ({ open, handleClose, handleOk, title, values, services, isNew }) => {
 
   const [serviceType, setServiceType] = useState(values?.serviceType || null)
@@ -24,14 +15,32 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
   useEffect(() => {
     if (serviceName) {
       let service = services.find(item => item.serviceInfo?.name == serviceName)
+      console.log(service)
       if (service) {
-        setPriceDetail(service.priceDetail)
+        if (!values || !values.priceDetail) {
+          setPriceDetail(service.priceDetail)
+        }
         setServiceType(service.serviceType)
       }
     }
   }, [serviceName])
 
-  function getPriceDetailForm() {
+  useEffect(() => {
+    setServiceType(values?.serviceType || null)
+    setServiceName(values?.serviceInfo.name || '')      
+    setPriceDetail(values?.priceDetail || {})
+  }, [JSON.stringify(values)])
+
+
+  const onClose = () => {
+    setServiceType(null)
+    setServiceName('')
+    setPriceDetail({})
+    handleClose()
+  }
+
+  function getPriceDetailForm(priceDetail, serviceType) {
+    console.log(priceDetail)
     switch(serviceType) {
       case null:
         return <></>
@@ -56,7 +65,7 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
                             ...priceDetail,
                             [key]: {
                               ...priceDetail[key],
-                              price: e.target.value
+                              price: Number(e.target.value) || 0
                             }
                           })}
                         />
@@ -102,7 +111,7 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
                   inputProps={{ maxLength: 50 }}
                   onChange={e => setPriceDetail({
                     ...priceDetail,
-                    price: e.target.value
+                    price: Number(e.target.value) || 0
                   })}
                 />
               </FormControl>
@@ -119,7 +128,7 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
                     inputProps={{ maxLength: 50 }}
                     onChange={e => setPriceDetail({
                       ...priceDetail,
-                      numberOfMonths: e.target.value
+                      numberOfMonths: Number(e.target.value) || 0
                     })}
                   />
                 </FormControl>
@@ -136,7 +145,7 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
                     inputProps={{ maxLength: 50 }}
                     onChange={e => setPriceDetail({
                       ...priceDetail,
-                      numberOfSessions: e.target.value
+                      numberOfSessions: Number(e.target.value) || 0
                     })}
                   />
                 </FormControl>
@@ -174,7 +183,7 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
                   inputProps={{ maxLength: 50 }}
                   onChange={e => setPriceDetail({
                     ...priceDetail,
-                    price: e.target.value
+                    price: Number(e.target.value) || 0
                   })}
                 />
               </FormControl>
@@ -205,8 +214,9 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
       open={open}
       fullWidth={true}
       maxWidth={'md'}
-      onClose={handleClose}
+      onClose={onClose}
       aria-describedby="alert-dialog-slide-description"
+      keepMounted={false}
     >
       <DialogTitle>
         <h2 style={{
@@ -241,10 +251,10 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
             </Select>
           </FormControl>
         </Box>
-        {getPriceDetailForm()}
+        {getPriceDetailForm(priceDetail, serviceType)}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Hủy</Button>
+        <Button onClick={onClose}>Hủy</Button>
         <Button onClick={(e) => {
           e.preventDefault()
           let service = services.find(item => item.serviceInfo?.name == serviceName)
@@ -253,7 +263,7 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
             ...service,
             priceDetail
           })
-        }}>{isNew ? 'Thêm' : 'Cập nhật'}</Button>
+        }}>{!values ? 'Thêm' : 'Cập nhật'}</Button>
       </DialogActions>
     </Dialog>
   )

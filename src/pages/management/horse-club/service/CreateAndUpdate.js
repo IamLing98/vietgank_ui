@@ -288,7 +288,6 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
         <CKEditor
           title='Mô tả dịch vụ'
           onChange={(event, editor, data) => {
-            console.log(event.data)
             setValue('serviceInfo.description', event.data)
           }}
           defaultData={getValues('serviceInfo.description')}
