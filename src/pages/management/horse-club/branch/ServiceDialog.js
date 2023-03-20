@@ -40,7 +40,6 @@ export default ({ open, handleClose, handleOk, title, values, services, isNew })
   }
 
   function getPriceDetailForm(priceDetail, serviceType) {
-    console.log(priceDetail)
     switch(serviceType) {
       case null:
         return <></>

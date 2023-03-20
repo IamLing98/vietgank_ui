@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useEffect, useMemo, useState } from 'react';
 import constants from 'utils/constants';
 import ConfirmDialog from 'components/DialogUtils/ConfirmDialog'
@@ -41,9 +43,11 @@ const initDefaultValues = {
     description: null,
     address: null,
     images: [],
-    thumbnail: null
+    thumbnail: null,
+    numberOfTables: 0
   },
   services: [],
+  tables: [],
   bookingTypeCode: 'HORSE_CLUB'
 };
 
@@ -57,6 +61,9 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
   const [currentServices, setCurrentServices] = useState([
     ...pageStatus.record?.services || []
   ])
+  const [currentTables, setCurrentTables] = useState([
+    ...(pageStatus.record?.tables || [])
+  ])
 
   const [currentImages, setCurrentImages] = useState([])
   const [updating, setUpdating] = useState(false)
@@ -66,6 +73,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
   const [openDeleteServiceModal, setOpenDeleteServiceModal] = useState(false)
   const [titleDeleteServiceModal, setTitleDeleteServiceModal] = useState('Xóa dịch vụ')
   const [contentDeleteServiceModal, setContentDeleteServiceModal] = useState('')
+  const [selectedTable, setSelectedTable] = useState(null)
 
   const handleCloseDeleteServiceModal = () => {
     setOpenDeleteServiceModal(false)
@@ -85,11 +93,34 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
     }
   }
 
+  const toggleTableStatus = (table, idx) => {
+    table.status = !table.status
+    let tables = [...currentTables]
+    tables.splice(idx, 1, table)
+    setCurrentTables(tables)
+    setSelectedTable(table)
+  }
+
+  const handleRemoveTable = () => {
+    if (selectedTable?.status) {
+      toast.error(`Bàn hiện tại được đặt, không thể xóa!`)
+      return
+    }
+    let tableIdx = currentTables.findIndex(item => item._id == selectedTable?._id)
+    if (tableIdx >= 0) {
+      let newTables = [...currentTables]
+      newTables.splice(tableIdx, 1)
+      setValue('bookingInfo.numberOfTables', currentTables.length - 1)
+      setCurrentTables(newTables)
+      setSelectedTable(null)
+    }
+  }
+
   const schema = yup.object().shape({
     bookingInfo: yup.object().shape({
       name: yup.string().nullable().required('Trường thông tin bắt buộc'),
       address: yup.string().nullable().required('Trường thông tin bắt buộc'),
-      numberOfTables: yup.number().required('Trường thông tin bắt buộc').min(1, 'Trường thông tin bắt buộc'),
+      numberOfTables: yup.number().nullable().required('Trường thông tin bắt buộc').min(1, 'Trường thông tin bắt buộc'),
     })
   });
 
@@ -102,6 +133,17 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
   const handleCloseServicesModal = () => {
     setServicesModalOpen(false)
     setSelectedService(null)
+  }
+
+  const handleAddTable = () => {
+    setCurrentTables([
+      ...currentTables,
+      {
+        _id: Math.round(Math.random() * new Date().getTime()),
+        status: 0
+      }
+    ])
+    setValue('bookingInfo.numberOfTables', currentTables.length + 1)
   }
 
   const serviceHeadCells = useMemo(() => {
@@ -195,6 +237,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
     handleSubmit,
     setValue,
     getValues,
+    watch,
     formState: { errors },
     control
   } = useForm({
@@ -204,6 +247,29 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
         return pageStatus.record;
       }, [JSON.stringify(pageStatus)])
     })
+
+  const watchNumberOfTables = watch("bookingInfo.numberOfTables", 0)
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name == 'bookingInfo.numberOfTables' && pageStatus.status == 'CREATE') {
+        let numberOfTables = Number(value?.bookingInfo?.numberOfTables)
+        if (numberOfTables > currentTables.length) {
+          let newTables = new Array(numberOfTables - currentTables.length).fill({
+            _id: Math.round(Math.random() * new Date().getTime()),
+            status: 0
+          })
+          setCurrentTables([
+            ...currentTables,
+            ...newTables
+          ])
+        } else if (numberOfTables < currentTables.length) {
+          setCurrentTables(currentTables.slice(0, numberOfTables))
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
   
   const onNewImages = e => {
     e.preventDefault();
@@ -253,6 +319,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
         ...currentServices,
         serviceInfo
       ])
+      toast.info('Nhấn \'Cập nhật\' để lưu thay đổi')
     } else {
       let serviceIdx = currentServices.findIndex(item => item._id == serviceInfo._id)
       if (serviceIdx >= 0) {
@@ -352,6 +419,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
                               className="mt-3 w-full"
                               type="number"
                               required
+                              disabled
                               inputProps={{ maxLength: 50 }}
                           />
                       );
@@ -361,6 +429,33 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
               />
               <p className="text-red">{errors?.bookingInfo?.numberOfTables?.message}</p>
           </Box>
+        </div>
+        <div className="container bg-white p-3 my-5">
+          <div className="flex items-center gap-x-3">
+            <h3 className="text-lg font-medium text-gray-800 dark:text-white">Trạng thái bàn</h3>
+            <Button style={{ margin: '5px' }} type='button' onClick={handleAddTable}>Thêm bàn</Button>
+            <Button style={{ margin: '5px' }} type='button' disabled={!selectedTable} onClick={handleRemoveTable}>Xóa bàn</Button>
+          </div>
+          <div className='grid grid-cols-8 gap-2'>
+            {currentTables.map((item, idx) => {
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+              return <Tooltip key={item._id} title={item.status ? 'Chuyển thành trống' : 'Chuyển thành đặt'}>
+                <div style={{
+                  padding: '15px',
+                  backgroundColor: item.status ? 'red' : 'green',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  color: 'white',
+                  border: selectedTable && selectedTable._id == item._id ? '2px solid blue' : 'none'
+                }} onClick={e => {
+                  e.preventDefault()
+                  toggleTableStatus(item, idx)
+                }}>
+                  {idx + 1}
+                </div>
+              </Tooltip>
+            })}
+          </div>
         </div>
         <div className="container bg-white p-3 mt-5">
           <div className="flex items-center gap-x-3">
@@ -575,6 +670,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
             values.bookingInfo.images = currentImages
             values.bookingTypeCode = 'HORSE_CLUB'
             values.services = dataUtils.camelToSnakeCaseWithArray(currentServices)
+            values.tables = currentTables
             onSubmit({
               newImages,
               thumbnail,
