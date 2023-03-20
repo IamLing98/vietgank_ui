@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import constants from 'utils/constants';
+import ConfirmDialog from 'components/DialogUtils/ConfirmDialog'
 
 import { useForm, Controller } from 'react-hook-form';
 
@@ -61,6 +62,28 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
   const [updating, setUpdating] = useState(false)
   const [serviceDialogTitle, setServiceDialogTitle] = useState('Thêm mới dịch vụ')
   const [selectedService, setSelectedService] = useState(null)
+
+  const [openDeleteServiceModal, setOpenDeleteServiceModal] = useState(false)
+  const [titleDeleteServiceModal, setTitleDeleteServiceModal] = useState('Xóa dịch vụ')
+  const [contentDeleteServiceModal, setContentDeleteServiceModal] = useState('')
+
+  const handleCloseDeleteServiceModal = () => {
+    setOpenDeleteServiceModal(false)
+    setSelectedService(null)
+  }
+
+  const handleConfirmDeleteService = () => {
+    console.log(selectedService)
+    let serviceIdx = currentServices.findIndex(item => item._id == selectedService._id)
+    if (serviceIdx >= 0) {
+      let newServices = [...currentServices]
+      newServices.splice(serviceIdx, 1)
+      setCurrentServices(newServices)
+      setSelectedService(null)
+      setOpenDeleteServiceModal(false)
+      toast.info('Nhấn \'Cập nhật\' để lưu thay đổi')
+    }
+  }
 
   const schema = yup.object().shape({
     bookingInfo: yup.object().shape({
@@ -140,7 +163,9 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
                       type="button"
                       className="flex items-center justify-center w-1/2 px-4 py-2 text-sm tracking-wide text-red transition-colors duration-200 bg-gray-100 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-gray-300 dark:hover:bg-gray-300 dark:bg-gray-300"
                       onClick={() => {
-                        console.log('Hello world')
+                        setSelectedService(record)
+                        setContentDeleteServiceModal(`Xác nhận xóa dịch vụ: ${record.serviceInfo.name}`)
+                        setOpenDeleteServiceModal(true)
                       }}
                     >
                         <svg
@@ -570,6 +595,14 @@ export default ({ onSubmit, pageStatus, setPageStatus, services }) => {
         </button>
       </div>
       </form>
+      <ConfirmDialog 
+        open={openDeleteServiceModal}
+        title={titleDeleteServiceModal}
+        content={contentDeleteServiceModal}
+        handleCancel={handleCloseDeleteServiceModal}
+        handleConfirm={handleConfirmDeleteService}
+        maxWidth={'sm'}
+      />
     </div>
   )
 }

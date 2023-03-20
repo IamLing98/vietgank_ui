@@ -33,7 +33,6 @@ import {
 import DatePicker from '@mui/lab/DatePicker';
 import dataUtils from 'utils/dataUtils';
 
-import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { CloseCircleOutlined } from '@ant-design/icons'
 import { toast } from 'react-toastify'
@@ -45,7 +44,8 @@ const initDefaultValues = {
     description: null,
     images: [],
     thumbnail: null
-  }
+  },
+  serviceType: null
 };
 
 export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
@@ -60,7 +60,8 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
   const schema = yup.object().shape({
     serviceInfo: yup.object().shape({
       name: yup.string().nullable().required('Trường thông tin bắt buộc')
-    })
+    }),
+    serviceType: yup.string().nullable().required('Trường thông tin bắt buộc')
   });
 
   const {
@@ -148,7 +149,7 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
           </div>
           <div className="grid grid-cols-2 gap-4"></div>
         </div>
-        <div className="grid grid-cols-1 gap-4 p-3">
+        <div className="grid grid-cols-2 gap-4 p-3">
           <Box>
             <Controller
               render={({ field, formState, fieldState }) => {
@@ -169,6 +170,37 @@ export default ({ onSubmit, pageStatus, setPageStatus, categories }) => {
               control={control}
             />
             <p className="text-red">{errors?.serviceInfo?.name?.message}</p>
+          </Box>
+          <Box>
+            <Controller
+              render={({ field, formState, fieldState }) => {
+                return (
+                  <FormControl sx={{  minWidth: 120 }} className="mt-3 w-full" fullWidth>
+                      <InputLabel id="demo-simple-select-helper-label">Loại dịch vụ</InputLabel>
+                      <Select
+                          labelId="demo-simple-select-helper-label"
+                          id="demo-simple-select-helper"
+                          label="Loại dịch vụ"
+                          {...field}
+                          fullWidth
+                          required
+                          error={!!formState.errors?.role}
+                          disabled={pageStatus.status == 'UPDATE'}
+                      >
+                        <MenuItem value={null}>
+                            <em>None</em>
+                        </MenuItem>
+                        {Object.keys(constants.HORSE_SERVICES_MAP).map(key => {
+                          return <MenuItem value={key} key={key}>{constants.HORSE_SERVICES_MAP[key]}</MenuItem>
+                        })}
+                      </Select>
+                  </FormControl>
+                )
+              }}
+              name="serviceType"
+              control={control}
+            />
+            <p className="text-red">{errors?.serviceType?.message}</p>
           </Box>
         </div>
         <div className="container bg-white p-3 mt-5">

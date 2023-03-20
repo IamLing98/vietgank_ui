@@ -24,6 +24,12 @@ const constants = {
     TAB_ACTIVE_CLASS:{
         ACTIVE:'px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 bg-gray-100 sm:text-sm dark:bg-gray-800 dark:text-gray-300',
         INACTIVE:'px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100',
+    },
+    HORSE_SERVICES_MAP: {
+        "JUST_FOR_ONE_DAY": "Khóa tham quan",
+        "COURSE": "Khóa học",
+        "PICNIC": "Picnic",
+        "STAY": "Lưu trữ"
     }
 };
 
