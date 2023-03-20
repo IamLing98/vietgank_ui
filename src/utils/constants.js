@@ -29,7 +29,7 @@ const constants = {
         "JUST_FOR_ONE_DAY": "Khóa tham quan",
         "COURSE": "Khóa học",
         "PICNIC": "Picnic",
-        "STAY": "Lưu trữ"
+        "STAY": "Lưu trú"
     }
 };
 
