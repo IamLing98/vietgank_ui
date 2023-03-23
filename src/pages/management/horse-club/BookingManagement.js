@@ -1,6 +1,10 @@
 import { Autocomplete, Grid, Paper } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
+import constants from 'utils/constants'
+import List from './List'
+import axios from 'axios'
+import dataUtils from 'utils/dataUtils'
 
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
@@ -16,115 +20,261 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; //
 
 import TableList from '../../../components/TableList';
+import DeleteConfirm from './booking/DeleteConfirm'
+import CreateAndUpdate from './booking/CreateAndUpdate'
 
 export default function ({}) {
+    const [loading, setLoading] = useState(false)
+
+    const [columns, setColumns] = useState([])
+
+    const [dataSource, setDataSource] = useState({
+        data: [],
+        total: 0
+    })
+
+    const [pageStatus, setPageStatus] = useState({...constants.PAGE_STATUS.LIST})
+
     const [searchValues, setSearchValues] = useState({
-        tenant: {
-            label: 'The Shawshank Redemption',
-            year: 1994
-        }
+        page: 0,
+        size: 10,
+        is_deleted: 'false'
     });
 
-    function handleChangeSearch() {}
+    const [bookings, setBookings] = useState([])
+    const [services, setServices] = useState([])
+    const [selectedBooking, setSelectedBooking] = useState(null)
+    const [selectedService, setSelectedService] = useState(null)
 
-    useEffect(() => {}, []);
-
-    const selectionRange = {
-        startDate: new Date(),
-        endDate: new Date(),
-        key: 'selection'
-    };
-
-    function handleSelect(ranges) {
-        console.log(ranges);
-        // {
-        //   selection: {
-        //     startDate: [native Date Object],
-        //     endDate: [native Date Object],
-        //   }
-        // }
-    }
-
-    const [anchorEl, setAnchorEl] = React.useState(null);
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const open = Boolean(anchorEl);
-    const id = open ? 'simple-popover' : undefined;
-
-    const columns = [
+    const headCells = [
         {
-            id: 'index',
-            title: 'STT',
-            render: (text, record, index) => {
-                return text;
+            id: 'booking_name',
+            numeric: false,
+            disablePadding: true,
+            label: 'Chi nhánh',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.bookings?.bookingInfo?.name}
+                    </p>
+                );
             }
         },
         {
-            id: 'index',
-            title: 'STT',
-            render: (text, record, index) => {
-                return text;
+            id: 'service_name',
+            numeric: false,
+            disablePadding: true,
+            label: 'Dịch vụ',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.services?.serviceInfo?.name}
+                    </p>
+                );
             }
         },
         {
-            id: 'index',
-            title: 'STT',
-            render: (text, record, index) => {
-                return text;
+            id: 'user_name',
+            numeric: false,
+            disablePadding: true,
+            label: 'User',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.userInfo?.username}
+                    </p>
+                );
             }
         },
         {
-            id: 'index',
-            title: 'STT',
-            render: (text, record, index) => {
-                return text;
+            id: 'time',
+            numeric: false,
+            disablePadding: true,
+            label: 'Thời gian',
+            render: (value, record, index) => {
+                let date = record?.orderInfo?.bookingTime ? new Date(record.orderInfo.bookingTime) : ''
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {date ? `${date.toDateString()}-${date.getHours()}:${date.getMinutes()}` : ''}
+                    </p>
+                );
+            }
+        },
+        {
+            id: 'persons',
+            numeric: false,
+            disablePadding: true,
+            label: 'Số người',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.orderInfo?.persons ? record?.orderInfo?.persons : 1}
+                    </p>
+                );
+            }
+        },
+        {
+            id: 'tables',
+            numeric: false,
+            disablePadding: true,
+            label: 'Số bàn',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.orderInfo?.tableIndexes?.map(item => item + 1).toString()}
+                    </p>
+                );
             }
         }
-    ];
+    ]
+
+    async function fetchBookings() {
+        axios
+            .get('/api/booking?booking_type_code=HORSE_CLUB')
+            .then((response) => {
+                setBookings(dataUtils.snakeToCamelCaseWithArray(response.data?.data.map(item => ({
+                    _id: item._id,
+                    label: item.booking_info?.name
+                })) || []))
+            })
+            .catch((error) => {
+                console.error(`Errorr: `, error);
+                setSizes([]);
+            });
+    }
+
+    async function fetchServices() {
+        axios
+            .get('/api/horse-service')
+            .then((response) => {
+                setServices(dataUtils.snakeToCamelCaseWithArray(response.data?.data.map(item => ({
+                    _id: item._id,
+                    label: item.service_info?.name
+                })) || []))
+            })
+            .catch((error) => {
+                console.error(`Errorr: `, error);
+                setSizes([]);
+            });
+    }
+
+    async function getDataSource(searchValues) {
+        await setLoading(true);
+        let object = { ...searchValues };
+        object.page = object.page + 1;
+        const qs = '?' + new URLSearchParams(dataUtils?.removeNullOrUndefined(object)).toString();
+        axios
+            .get(`/api/order/booking/horse-club${qs}`)
+            .then(async (response) => {
+                let data = response.data;
+                if (data?.success) {
+                    setDataSource({
+                        data: data?.data?.map((item) => {
+                            return dataUtils?.snakeToCamelCase(item)
+                        }),
+                        total: data?.meta?.total
+                    });
+                }
+                await setLoading(false);
+                return data.dataSource;
+            })
+            .catch((err) => {
+                setDataSource({ data: [], total: 0 }); 
+                setLoading(false);
+            });
+    }
+
+    useEffect(() => {
+        getDataSource(searchValues);
+    }, [JSON.stringify(pageStatus), JSON.stringify(searchValues)]);
+
+    useEffect(() => {
+        (async () => {
+            await fetchServices()
+            await fetchBookings()
+        })()
+    }, [])
+
+    const handleSearch = () => {
+        let res = {}
+        if (selectedBooking) {
+            res['booking.booking_id'] = selectedBooking._id
+        }
+        if (selectedService) {
+            res['booking.service_id'] = selectedService._id
+        }
+        if (Object.keys(res).length) {
+            setSearchValues({
+                ...searchValues,
+                ...res
+            })
+        } else {
+            setSearchValues({
+                page: 0,
+                size: 10,
+                is_deleted: 'false'
+            })
+        }
+    }
 
     function Header() {
         return (
             <>
                 <Grid container spacing={2} marginBottom={4}>
-                    <Grid item xs={2}>
+                    <Grid item xs={3}>
                         <Box>
-                            <InputLabel id="demo-simple-select-label" className="field-label">
-                                Khách hàng
+                            <InputLabel id="booking" className="field-label">
+                                Chi nhánh
                             </InputLabel>
                             <FormControl hiddenLabel fullWidth>
                                 <Autocomplete
                                     disablePortal
-                                    id="combo-box-demo"
-                                    options={top100Films}
+                                    id="booking"
+                                    options={bookings}
+                                    sx={{ width: 300 }}
+                                    value={selectedBooking}
+                                    onChange={(event, value) => {
+                                        setSelectedBooking(value)
+                                    }}
                                     renderInput={(params) => <TextField className="autocomplete-custom" {...params} variant="outlined" />}
                                 />
                             </FormControl>
                         </Box>
                     </Grid>
-                    <Grid item xs={2}>
+                    <Grid item xs={3}>
                         <Box>
-                            <InputLabel id="demo-simple-select-label" className="field-label">
-                                Chi nhánh
+                            <InputLabel id="service" className="field-label">
+                                Dịch vụ
                             </InputLabel>
                             <FormControl hiddenLabel fullWidth>
                                 <Autocomplete
                                     disablePortal
-                                    id="combo-box-demo"
-                                    options={top100Films}
+                                    id="service"
+                                    options={services}
+                                    sx={{ width: 300 }}
+                                    value={selectedService}
+                                    onChange={(event, value) => {
+                                        setSelectedService(value)
+                                    }}
                                     className="autocomplete-custom"
                                     renderInput={(params) => <TextField {...params} variant="outlined" />}
                                 />
                             </FormControl>
                         </Box>
                     </Grid>
-                    <Grid item xs={2}>
+                    {/* <Grid item xs={2}>
                         <Box>
                             <InputLabel id="demo-simple-select-label" className="field-label">
                                 Dịch vụ
@@ -139,8 +289,8 @@ export default function ({}) {
                                 />
                             </FormControl>
                         </Box>
-                    </Grid>
-                    <Grid item xs={2}>
+                    </Grid> */}
+                    {/* <Grid item xs={2}>
                         <Box>
                             <InputLabel id="demo-simple-select-label" className="field-label">
                                 Ngày đặt
@@ -166,8 +316,8 @@ export default function ({}) {
                                 </Popover>
                             </FormControl>
                         </Box>
-                    </Grid>
-                    <Grid item xs={2}>
+                    </Grid> */}
+                    {/* <Grid item xs={2}>
                         <Box>
                             <InputLabel id="demo-simple-select-label" className="field-label">
                                 Trạng thái
@@ -182,9 +332,9 @@ export default function ({}) {
                                 />
                             </FormControl>
                         </Box>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={2}>
-                        <Button variant="contained" className="search-button">
+                        <Button variant="contained" className="search-button" onClick={handleSearch}>
                             Tìm kiếm
                         </Button>
                     </Grid>
@@ -193,140 +343,56 @@ export default function ({}) {
         );
     }
 
+    const onDelete = async () => {
+
+    }
+
+    const onUpdate = async () => {
+
+    }
+
+    const onCreate = async () => {
+
+    }
+
     return (
         <>
             <Header />
             <Grid container spacing={2} marginBottom={4}>
-                <TableList columns={columns}/>
-            </Grid>
+            {pageStatus.status === constants.PAGE_STATUS.LIST.status || pageStatus.status === constants.PAGE_STATUS.DELETE.status ? (
+                    <>
+                        <List 
+                            loading={loading}
+                            setPageStatus={setPageStatus}
+                            columns={columns}
+                            dataSource={dataSource}
+                            setSearchValues={setSearchValues}
+                            searchValues={searchValues}
+                            headCells={headCells}
+                            title="Danh sách chi nhánh"
+                        />
+                        <DeleteConfirm
+                            pageStatus={pageStatus}
+                            onSubmit={onDelete}
+                            setPageStatus={setPageStatus}
+                            open={pageStatus.status === constants.PAGE_STATUS.DELETE.status}
+                        />
+                    </>
+                ) : (
+                ''
+            )}
+            {pageStatus.status === constants.PAGE_STATUS.CREATE.status ? (
+                <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onCreate} services={services} />
+            ) : (
+                ''
+            )}
+            {pageStatus.status === constants.PAGE_STATUS.UPDATE.status ? (
+                <CreateAndUpdate pageStatus={pageStatus} setPageStatus={setPageStatus} onSubmit={onUpdate} services={services} />
+            ) : (
+                ''
+            )}
+        </Grid>
         </>
     );
 }
 
-// Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-    { label: 'The Dark Knight', year: 2008 },
-    { label: '12 Angry Men', year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    { label: 'Pulp Fiction', year: 1994 },
-    {
-        label: 'The Lord of the Rings: The Return of the King',
-        year: 2003
-    },
-    { label: 'The Good, the Bad and the Ugly', year: 1966 },
-    { label: 'Fight Club', year: 1999 },
-    {
-        label: 'The Lord of the Rings: The Fellowship of the Ring',
-        year: 2001
-    },
-    {
-        label: 'Star Wars: Episode V - The Empire Strikes Back',
-        year: 1980
-    },
-    { label: 'Forrest Gump', year: 1994 },
-    { label: 'Inception', year: 2010 },
-    {
-        label: 'The Lord of the Rings: The Two Towers',
-        year: 2002
-    },
-    { label: "One Flew Over the Cuckoo's Nest", year: 1975 },
-    { label: 'Goodfellas', year: 1990 },
-    { label: 'The Matrix', year: 1999 },
-    { label: 'Seven Samurai', year: 1954 },
-    {
-        label: 'Star Wars: Episode IV - A New Hope',
-        year: 1977
-    },
-    { label: 'City of God', year: 2002 },
-    { label: 'Se7en', year: 1995 },
-    { label: 'The Silence of the Lambs', year: 1991 },
-    { label: "It's a Wonderful Life", year: 1946 },
-    { label: 'Life Is Beautiful', year: 1997 },
-    { label: 'The Usual Suspects', year: 1995 },
-    { label: 'Léon: The Professional', year: 1994 },
-    { label: 'Spirited Away', year: 2001 },
-    { label: 'Saving Private Ryan', year: 1998 },
-    { label: 'Once Upon a Time in the West', year: 1968 },
-    { label: 'American History X', year: 1998 },
-    { label: 'Interstellar', year: 2014 },
-    { label: 'Casablanca', year: 1942 },
-    { label: 'City Lights', year: 1931 },
-    { label: 'Psycho', year: 1960 },
-    { label: 'The Green Mile', year: 1999 },
-    { label: 'The Intouchables', year: 2011 },
-    { label: 'Modern Times', year: 1936 },
-    { label: 'Raiders of the Lost Ark', year: 1981 },
-    { label: 'Rear Window', year: 1954 },
-    { label: 'The Pianist', year: 2002 },
-    { label: 'The Departed', year: 2006 },
-    { label: 'Terminator 2: Judgment Day', year: 1991 },
-    { label: 'Back to the Future', year: 1985 },
-    { label: 'Whiplash', year: 2014 },
-    { label: 'Gladiator', year: 2000 },
-    { label: 'Memento', year: 2000 },
-    { label: 'The Prestige', year: 2006 },
-    { label: 'The Lion King', year: 1994 },
-    { label: 'Apocalypse Now', year: 1979 },
-    { label: 'Alien', year: 1979 },
-    { label: 'Sunset Boulevard', year: 1950 },
-    {
-        label: 'Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb',
-        year: 1964
-    },
-    { label: 'The Great Dictator', year: 1940 },
-    { label: 'Cinema Paradiso', year: 1988 },
-    { label: 'The Lives of Others', year: 2006 },
-    { label: 'Grave of the Fireflies', year: 1988 },
-    { label: 'Paths of Glory', year: 1957 },
-    { label: 'Django Unchained', year: 2012 },
-    { label: 'The Shining', year: 1980 },
-    { label: 'WALL·E', year: 2008 },
-    { label: 'American Beauty', year: 1999 },
-    { label: 'The Dark Knight Rises', year: 2012 },
-    { label: 'Princess Mononoke', year: 1997 },
-    { label: 'Aliens', year: 1986 },
-    { label: 'Oldboy', year: 2003 },
-    { label: 'Once Upon a Time in America', year: 1984 },
-    { label: 'Witness for the Prosecution', year: 1957 },
-    { label: 'Das Boot', year: 1981 },
-    { label: 'Citizen Kane', year: 1941 },
-    { label: 'North by Northwest', year: 1959 },
-    { label: 'Vertigo', year: 1958 },
-    {
-        label: 'Star Wars: Episode VI - Return of the Jedi',
-        year: 1983
-    },
-    { label: 'Reservoir Dogs', year: 1992 },
-    { label: 'Braveheart', year: 1995 },
-    { label: 'M', year: 1931 },
-    { label: 'Requiem for a Dream', year: 2000 },
-    { label: 'Amélie', year: 2001 },
-    { label: 'A Clockwork Orange', year: 1971 },
-    { label: 'Like Stars on Earth', year: 2007 },
-    { label: 'Taxi Driver', year: 1976 },
-    { label: 'Lawrence of Arabia', year: 1962 },
-    { label: 'Double Indemnity', year: 1944 },
-    {
-        label: 'Eternal Sunshine of the Spotless Mind',
-        year: 2004
-    },
-    { label: 'Amadeus', year: 1984 },
-    { label: 'To Kill a Mockingbird', year: 1962 },
-    { label: 'Toy Story 3', year: 2010 },
-    { label: 'Logan', year: 2017 },
-    { label: 'Full Metal Jacket', year: 1987 },
-    { label: 'Dangal', year: 2016 },
-    { label: 'The Sting', year: 1973 },
-    { label: '2001: A Space Odyssey', year: 1968 },
-    { label: "Singin' in the Rain", year: 1952 },
-    { label: 'Toy Story', year: 1995 },
-    { label: 'Bicycle Thieves', year: 1948 },
-    { label: 'The Kid', year: 1921 },
-    { label: 'Inglourious Basterds', year: 2009 },
-    { label: 'Snatch', year: 2000 },
-    { label: '3 Idiots', year: 2009 },
-    { label: 'Monty Python and the Holy Grail', year: 1975 }
-];
