@@ -137,6 +137,37 @@ export default function ({}) {
                     </p>
                 );
             }
+        },
+        {
+            id: 'payment_type',
+            numeric: false,
+            disablePadding: true,
+            label: 'Hình thức thanh toán',
+            render: (value, record, index) => {
+                console.log(record?.orderInfo?.paymentType)
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {record?.orderInfo?.paymentType ? constants.PAYMENT_TYPE[record?.orderInfo?.paymentType] : constants.PAYMENT_TYPE['CASH']}
+                    </p>
+                );
+            }
+        },
+        {
+            id: 'status',
+            numeric: false,
+            disablePadding: true,
+            label: 'Trạng thái',
+            render: (value, record, index) => {
+                return (
+                    <p className="text-ellipsis overflow-hidden whitespace-nowrap" style={{
+                        maxWidth: '200px'
+                    }}>
+                        {constants.ORDER_STATUS[record?.status]}
+                    </p>
+                );
+            }
         }
     ]
 
