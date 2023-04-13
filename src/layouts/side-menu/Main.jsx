@@ -22,14 +22,14 @@ function MainWrapper() {
   const sideMenuStore = useRecoilValue(useSideMenuStore);
   const sideMenu = () => nestedMenu($h.toRaw(sideMenuStore.menu), location);
 
-  const authReducer = useSelector(store=>store?.auth)
+  const authReducer = useSelector((store) => store?.auth);
 
-  useEffect(()=>{
-    console.log(authReducer)
-    if(!authReducer.isLoggedIn){
-      navigate('/login')
+  useEffect(() => {
+    console.log(authReducer);
+    if (!authReducer.isLoggedIn) {
+      navigate("/login");
     }
-  },[])
+  }, []);
 
   useEffect(() => {
     dom("body").removeClass("error-page").removeClass("login").addClass("main");
@@ -184,9 +184,9 @@ function MainWrapper() {
         {/* END: Side Menu */}
         {/* BEGIN: Content */}
         <div className="content">
-          <TopBar /> 
+          <TopBar />
           <div className="content-main">
-          <Outlet />
+            <Outlet />
           </div>
         </div>
         {/* END: Content */}

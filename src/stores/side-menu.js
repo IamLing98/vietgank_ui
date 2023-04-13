@@ -56,7 +56,7 @@ const sideMenu = atom({
       },
       {
         icon: "ShoppingBag",
-        title: "E-Commerce",
+        title: "Quản lý Vietgangz Horse",
         subMenu: [
           {
             icon: "",
@@ -128,7 +128,7 @@ const sideMenu = atom({
       },
       {
         icon: "ShoppingBag",
-        title: "E-Commerce",
+        title: "Quản lý Vietgangz Original",
         subMenu: [
           {
             icon: "",
