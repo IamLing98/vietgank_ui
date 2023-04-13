@@ -15,7 +15,7 @@ import MainColorSwitcher from "@/components/main-color-switcher/Main";
 import SideMenuTooltip from "@/components/side-menu-tooltip/Main";
 import { useSelector } from "react-redux";
 
-function Main() {
+function MainWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
   const [formattedMenu, setFormattedMenu] = useState([]);
@@ -195,4 +195,4 @@ function Main() {
   );
 }
 
-export default Main;
+export default MainWrapper;
