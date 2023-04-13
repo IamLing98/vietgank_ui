@@ -10,12 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../redux/reducers/authSlice";
-import { useNavigate } from "react-router-dom";
-
-const schema = yup.object().shape({
-  username: yup.string().required("Trường thông tin bắt buộc "),
-  password: yup.string().required("Trường thông tin bắt buộc "),
-});
+import { useNavigate } from "react-router-dom";  
 
 function Login() {
   useEffect(() => {
@@ -25,6 +20,11 @@ function Login() {
   const dispatch = useDispatch();
 
   const navigate = useNavigate()
+
+  const schema = yup.object().shape({
+    username: yup.string().required("Trường thông tin bắt buộc "),
+    password: yup.string().required("Trường thông tin bắt buộc "),
+  });
 
   const {
     register,
@@ -86,16 +86,10 @@ function Login() {
                   Manage all your e-commerce accounts in one place
                 </div>
               </div>
-            </div>
-            {/* END: Login Info */}
-            {/* BEGIN: Login Form */}
+            </div> 
             <div className="h-screen xl:h-auto flex py-5 xl:py-0 my-10 xl:my-0">
               <div className="my-auto mx-auto xl:ml-20 bg-white dark:bg-darkmode-600 xl:bg-transparent px-5 sm:px-8 py-8 xl:p-0 rounded-md shadow-md xl:shadow-none w-full sm:w-3/4 lg:w-2/4 xl:w-auto">
                 <h2 className="intro-x font-bold text-2xl xl:text-3xl text-center xl:text-left">Đăng nhập</h2>
-                <div className="intro-x mt-2 text-slate-400 xl:hidden text-center">
-                  A few more clicks to sign in to your account. Manage all your e-commerce accounts in one
-                  place
-                </div>
                 <div className="intro-x mt-8">
                   <input
                     type="text"

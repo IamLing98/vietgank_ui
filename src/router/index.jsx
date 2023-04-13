@@ -71,6 +71,7 @@ import Validation from "../views/validation/Main";
 import Chart from "../views/chart/Main";
 import Slider from "../views/slider/Main";
 import ImageZoom from "../views/image-zoom/Main";
+import AdminAccount from "../views/admin-account";
 
 function Router() {
   const routes = [
@@ -165,6 +166,12 @@ function Router() {
         {
           path: "users-layout-1",
           element: <UsersLayout1 />,
+        },
+
+        // Admin account
+        {
+          path: "admin-account",
+          element: <AdminAccount />,
         },
         {
           path: "users-layout-2",

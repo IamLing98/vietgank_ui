@@ -12,6 +12,8 @@ import {
 import { faker as $f } from "@/utils";
 import * as $_ from "lodash";
 import classnames from "classnames";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/reducers/authSlice";
 
 function Main(props) {
   const [searchDropdown, setSearchDropdown] = useState(false);
@@ -21,6 +23,8 @@ function Main(props) {
   const hideSearchDropdown = () => {
     setSearchDropdown(false);
   };
+
+  const dispatch = useDispatch()
 
   return (
     <>
@@ -190,7 +194,7 @@ function Main(props) {
               src={$f()[9].photos[0]}
             />
           </DropdownToggle>
-          <DropdownMenu className="w-56">
+          <DropdownMenu  className="w-56">
             <DropdownContent className="bg-primary text-white">
               <DropdownHeader tag="div" className="!font-normal">
                 <div className="font-medium">{$f()[0].users[0].name}</div>
@@ -212,8 +216,8 @@ function Main(props) {
                 <Lucide icon="HelpCircle" className="w-4 h-4 mr-2" /> Help
               </DropdownItem>
               <DropdownDivider className="border-white/[0.08]" />
-              <DropdownItem className="hover:bg-white/5">
-                <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Logout
+              <DropdownItem onClick={e=> dispatch(logout())}  className="hover:bg-white/5">
+                <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Đăng xuất
               </DropdownItem>
             </DropdownContent>
           </DropdownMenu>

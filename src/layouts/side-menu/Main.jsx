@@ -29,7 +29,7 @@ function MainWrapper() {
     if (!authReducer.isLoggedIn) {
       navigate("/login");
     }
-  }, []);
+  }, [authReducer.isLoggedIn]);
 
   useEffect(() => {
     dom("body").removeClass("error-page").removeClass("login").addClass("main");
@@ -39,8 +39,8 @@ function MainWrapper() {
   return (
     // <div className="py-2">
     <div className="main-wrapper">
-      <DarkModeSwitcher />
-      <MainColorSwitcher />
+      {/* <DarkModeSwitcher /> */}
+      {/* <MainColorSwitcher /> */}
       <MobileMenu />
       <div className="flex mt-[4.7rem] md:mt-0">
         {/* BEGIN: Side Menu */}

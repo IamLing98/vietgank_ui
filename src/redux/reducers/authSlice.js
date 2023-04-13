@@ -5,7 +5,11 @@ import axios from 'axios';
 
 // initial state
 const initialState = {
-    isLoggedIn: false,
+    isLoggedIn:()=>{
+        let isAuthenticated = localStorage.getItem(constants.AUTH.TOKEN);
+        console.log(`isAuthenticated`, isAuthenticated)
+        return  localStorage.getItem(constants.AUTH.TOKEN) ? true : false
+    },
     userInfo: localStorage.getItem(constants.AUTH.USER_INFO) ? JSON.parse(localStorage.getItem(constants.AUTH.USER_INFO)) : {}
 }; 
 

@@ -247,8 +247,23 @@ const sideMenu = atom({
       },
       {
         icon: "Users",
-        title: "Users",
+        title: "Quản lý người dùng",
         subMenu: [
+          {
+            icon: "",
+            pathname: "/admin-account",
+            title: "Quản trị viên",
+          },
+          {
+            icon: "",
+            pathname: "/users-layout-1",
+            title: "Khách hàng",
+          },
+          {
+            icon: "",
+            pathname: "/users-layout-1",
+            title: "Layout 1",
+          },
           {
             icon: "",
             pathname: "/users-layout-1",

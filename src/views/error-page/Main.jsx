@@ -2,8 +2,12 @@ import DarkModeSwitcher from "@/components/dark-mode-switcher/Main";
 import dom from "@left4code/tw-starter/dist/js/dom";
 import errorIllustration from "@/assets/images/error-illustration.svg";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Main() {
+function BackToHome() {
+
+  const navigate = useNavigate()
+
   useEffect(() => {
     dom("body").removeClass("main").removeClass("login").addClass("error-page");
   }, []);
@@ -25,13 +29,13 @@ function Main() {
             <div className="text-white mt-10 lg:mt-0">
               <div className="intro-x text-8xl font-medium">404</div>
               <div className="intro-x text-xl lg:text-3xl font-medium mt-5">
-                Oops. This page has gone missing.
+                Oops. Trang không tồn tại
               </div>
               <div className="intro-x text-lg mt-3">
                 You may have mistyped the address or the page may have moved.
               </div>
-              <button className="intro-x btn py-3 px-4 text-white border-white dark:border-darkmode-400 dark:text-slate-200 mt-10">
-                Back to Home
+              <button onClick={e=>(navigate(-1))} className="intro-x btn py-3 px-4 text-white border-white dark:border-darkmode-400 dark:text-slate-200 mt-10">
+                Quay lại
               </button>
             </div>
           </div>
@@ -42,4 +46,4 @@ function Main() {
   );
 }
 
-export default Main;
+export default BackToHome;
