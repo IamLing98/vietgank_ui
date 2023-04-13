@@ -1,0 +1,35 @@
+.content {
+    /* border-radius: 30px; */
+    padding: 0px 0px;
+    max-height: 800px;
+    overflow-y: scroll; 
+     -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+
+    @apply min-w-0 min-h-screen bg-slate-100 flex-1 pb-10 dark:bg-darkmode-700;
+    @include media-breakpoint-down(md) {
+        @apply px-4 max-w-full;
+    }
+    &:before {
+        content: "";
+        @apply w-full h-px block;
+    }
+    
+}
+
+.content::-webkit-scrollbar {
+    display: none;
+  }
+
+
+  .side-bar-ul{
+    max-height: 80vh !important;
+    overflow-y: scroll;
+  }
+  .side-bar-ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .content-main{
+    padding: 0px 22px;
+  }
