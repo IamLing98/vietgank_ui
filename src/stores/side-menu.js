@@ -60,14 +60,19 @@ const sideMenu = atom({
         subMenu: [
           {
             icon: "",
-            pathname: "/categories",
-            title: "Categories",
+            pathname: "/vietgangz-horse/place",
+            title: "Quản lý địa điểm",
           },
           {
             icon: "",
-            pathname: "/add-product",
-            title: "Add Product",
+            pathname: "/vietgangz-horse/services",
+            title: "Quản lý dịch vụ",
           },
+          {
+            icon: "",
+            pathname: "/vietgangz-horse/foodsets",
+            title: "Quản lý set ăn",
+          }, 
           {
             icon: "",
             pathname: "/products",

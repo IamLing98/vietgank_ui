@@ -73,6 +73,11 @@ import Slider from "../views/slider/Main";
 import ImageZoom from "../views/image-zoom/Main";
 import AdminAccount from "../views/admin-account";
 
+// VietgangzHorse
+import VietgangzHorsePlaces from "../views/horse-services/place-management";
+import VietgangzHorseServices from "../views/horse-services/service-management";
+import VietgangzHorseFoodSet from "../views/horse-services/food-set-management";
+
 function Router() {
   const routes = [
     {
@@ -166,6 +171,20 @@ function Router() {
         {
           path: "users-layout-1",
           element: <UsersLayout1 />,
+        },
+
+        // Vietgangz horse 
+        {
+          path: "/vietgangz-horse/place",
+          element: <VietgangzHorsePlaces />,
+        },
+        {
+          path: "/vietgangz-horse/services",
+          element: <VietgangzHorseServices />,
+        },
+        {
+          path: "/vietgangz-horse/foodsets",
+          element: <VietgangzHorseFoodSet />,
         },
 
         // Admin account
